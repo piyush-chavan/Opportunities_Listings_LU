@@ -1,0 +1,134 @@
+.opportunity-card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.opportunity-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.card-left {
+  flex-shrink: 0;
+  min-width: 180px;
+  max-width: 220px;
+  padding-right: 20px;
+  border-right: 2px solid var(--border-color);
+}
+
+.card-id {
+  display: inline-block;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 16px;
+  margin-bottom: 10px;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+
+.card-right {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px 20px;
+}
+
+.card-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.field-label {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  opacity: 0.9;
+}
+
+.field-value {
+  font-size: 16px;
+  color: var(--text-primary);
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+/* Dark mode */
+[data-theme="dark"] .opportunity-card {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+[data-theme="dark"] .card-title {
+  color: #f9fafb;
+}
+
+[data-theme="dark"] .field-label {
+  color: #9ca3af;
+}
+
+[data-theme="dark"] .field-value {
+  color: #e5e7eb;
+}
+
+[data-theme="dark"] .card-left {
+  border-right-color: #374151;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .opportunity-card {
+    flex-direction: column;
+    padding: 18px;
+    gap: 14px;
+  }
+  
+  .card-left {
+    min-width: auto;
+    max-width: none;
+    padding-right: 0;
+    border-right: none;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 14px;
+  }
+
+  [data-theme="dark"] .card-left {
+    border-bottom-color: #374151;
+  }
+  
+  .card-body {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .card-title {
+    font-size: 15px;
+  }
+  
+  .field-value {
+    font-size: 12px;
+  }
+}
