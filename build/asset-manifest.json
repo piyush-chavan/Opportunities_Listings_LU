@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/Opportunities_Listings_LU/static/css/main.435d38a4.css",
+    "main.js": "/Opportunities_Listings_LU/static/js/main.440ce353.js",
+    "index.html": "/Opportunities_Listings_LU/index.html",
+    "main.435d38a4.css.map": "/Opportunities_Listings_LU/static/css/main.435d38a4.css.map",
+    "main.440ce353.js.map": "/Opportunities_Listings_LU/static/js/main.440ce353.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.435d38a4.css",
+    "static/js/main.440ce353.js"
+  ]
+}

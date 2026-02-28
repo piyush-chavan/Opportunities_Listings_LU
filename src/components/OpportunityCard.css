@@ -24,7 +24,7 @@
   border-right: 2px solid var(--border-color);
 }
 
-.card-id {
+.card-tag {
   display: inline-block;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -33,7 +33,61 @@
   padding: 4px 10px;
   border-radius: 16px;
   margin-bottom: 10px;
+  margin-right: 10px;
 }
+
+.card-text{
+  font-size: 14px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.mui-button {
+  /* Layout & Box Model */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;          /* MD3 standard horizontal padding */
+  margin: 5px;
+  height: 40px;             /* MD3 default button height */
+  min-width: 64px;
+  
+  /* Branding & Colors */
+  background-color: #0b57d0; /* Google Primary Blue */
+  background-color: #0bd05d;
+  color: #ffffff;
+  
+  /* Typography */
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+  text-decoration: none;    /* Removes link underline */
+  text-transform: none;     /* MD3 uses sentence case, not all-caps */
+  
+  /* Shape & Interaction */
+  border-radius: 20px;      /* Fully rounded corners (pill shape) */
+  border: none;
+  cursor: pointer;
+  transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1), 
+              background-color 150ms linear;
+  
+  /* Elevation (Resting state) */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+/* Hover & Focus States */
+.mui-button:hover {
+  background-color: #0842a0; /* Darker blue on hover */
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+
+.mui-button:active {
+  background-color: #062e6f;
+  box-shadow: none; /* Pressed state lowers elevation */
+}
+
 
 .card-title {
   margin: 0;
@@ -132,3 +186,17 @@
     font-size: 12px;
   }
 }
+.card-program-title{
+  font-size: 24px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+.card-entity-name{
+  font-size: 18px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+
