@@ -84,10 +84,11 @@ body {
 }
 
 .app-subtitle {
-  font-size: 14px;
-  opacity: 0.9;
+  font-size: 20px;
+  opacity: 0.6;
   text-align: left;
-  font-weight: 400;
+  font-weight: 500;
+  font-family: Poppins, sans-serif;
 }
 
 /* Main Content */

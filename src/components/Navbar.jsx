@@ -18,7 +18,7 @@ const Navbar = () => {
                     <Link to="#contact">Contact</Link>
                 </div>
 
-                <button className="navbar-btn" onClick={() => navigate('/listings')}>Explore</button>
+                <button className="navbar-btn" onClick={() => navigate('/listings')}><i class="fa-brands fa-wpexplorer"></i> Explore</button>
             </div>
         </nav>
     );

@@ -5,6 +5,7 @@ import ThemeToggle from './ThemeToggle';
 import SearchBar from './SearchBar';
 import { parseExcelFile, loadExcelFromAssets } from '../utils/excelParser';
 import '../App.css';
+import { useSearchParams } from 'react-router-dom';
 
 // Configuration: Set items per page here
 const ITEMS_PER_PAGE = 12;
@@ -26,6 +27,15 @@ function ListingPage() {
   const [error, setError] = useState(null);
   const [fileInput, setFileInput] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [filters, setFilters] = useState({
+    type: "",
+    season: "",
+    mode: "",
+    grade: "",
+    age: ""
+  });
   const [isDarkMode, setIsDarkMode] = useState(() => {
     try {
       const saved = localStorage.getItem('darkMode');
@@ -34,6 +44,29 @@ function ListingPage() {
       return false;
     }
   });
+
+  //Change URL according to filters
+  useEffect(() => {
+    const params = {};
+
+    Object.keys(filters).forEach((key) => {
+      if (filters[key]) {
+        params[key] = filters[key];
+      }
+    });
+
+    setSearchParams(params);
+  }, [filters]);
+
+  useEffect(() => {
+    setFilters({
+      type: searchParams.get("type") || "",
+      season: searchParams.get("season") || "",
+      mode: searchParams.get("mode") || "",
+      grade: searchParams.get("grade") || "",
+      age: searchParams.get("age") || ""
+    });
+  }, [searchParams]);
 
   // Apply dark mode theme
   useEffect(() => {
@@ -54,25 +87,35 @@ function ListingPage() {
     loadInitialData();
   }, []);
 
-  // Filter opportunities based on search query
+  // Apply filters and search together whenever opportunities, filters or searchQuery change
   useEffect(() => {
-    if (!searchQuery.trim()) {
-      setFilteredOpportunities(opportunities);
-      setCurrentPage(1);
-      return;
+    let result = opportunities || [];
+
+    // Apply dropdown filters
+    result = result.filter((opp) => {
+      return (
+        (!filters.type || opp["Type of Opportunity"]?.includes(filters.type)) &&
+        (!filters.season || opp["Season"]?.includes(filters.season)) &&
+        (!filters.mode || opp["Mode"]?.includes(filters.mode)) &&
+        (!filters.grade || opp["Grade"]?.includes(filters.grade)) &&
+        (!filters.age || opp["Age"]?.includes(filters.age))
+      );
+    });
+
+    // Apply text search on top of the filtered results
+    if (searchQuery && searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      result = result.filter(opportunity => {
+        return Object.values(opportunity).some(value => {
+          if (value === null || value === undefined) return false;
+          return String(value).toLowerCase().includes(query);
+        });
+      });
     }
 
-    const query = searchQuery.toLowerCase().trim();
-    const filtered = opportunities.filter(opportunity => {
-      return Object.values(opportunity).some(value => {
-        if (value === null || value === undefined) return false;
-        return String(value).toLowerCase().includes(query);
-      });
-    });
-    
-    setFilteredOpportunities(filtered);
+    setFilteredOpportunities(result);
     setCurrentPage(1);
-  }, [searchQuery, opportunities]);
+  }, [searchQuery, filters, opportunities]);
 
   const loadInitialData = async () => {
     setLoading(true);
@@ -113,7 +156,7 @@ function ListingPage() {
       'application/vnd.ms-excel',
       'text/csv'
     ];
-    
+
     if (!validTypes.includes(file.type) && !file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
       setError('Please upload a valid Excel file (.xlsx or .xls)');
       return;
@@ -143,6 +186,32 @@ function ListingPage() {
     }
   };
 
+  const applyFilters = () => {
+    const filteredOpportunities = opportunities.filter((opp) => {
+
+      return (
+        (!filters.type || opp["Type of Opportunity"]?.includes(filters.type)) &&
+        (!filters.season || opp["Season"]?.includes(filters.season)) &&
+        (!filters.mode || opp["Mode"]?.includes(filters.mode)) &&
+        (!filters.grade || opp["Grade"]?.includes(filters.grade)) &&
+        (!filters.age || opp["Age"]?.includes(filters.age))
+      );
+
+    });
+    setFilteredOpportunities(filteredOpportunities);
+  }
+
+  const clearFilters = () => {
+    setFilters({
+      type: "",
+      season: "",
+      mode: "",
+      grade: "",
+      age: ""
+    })
+    setFilteredOpportunities(opportunities);
+  }
+
   // Calculate pagination based on filtered opportunities
   const totalPages = Math.ceil(filteredOpportunities.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -160,7 +229,7 @@ function ListingPage() {
         <div className="container">
           <div className="header-content">
             <div>
-              <h1 className="app-title">Opportunities Listing</h1>
+              {/* <h1 className="app-title">Opportunities Listing</h1> */}
               <p className="app-subtitle">Browse and explore available opportunities</p>
             </div>
             <ThemeToggle isDarkMode={isDarkMode} onToggle={() => setIsDarkMode(!isDarkMode)} />
@@ -172,51 +241,45 @@ function ListingPage() {
         <div className="container">
           {/* File Upload Section */}
           <div className="upload-section">
-          <div className="upload-buttons">
+            <div className="upload-buttons">
 
-{/* Hidden File Input */}
-<input
-  type="file"
-  accept=".xlsx, .xls"
-  id="excel-upload"
-  style={{ display: "none" }}
-  onChange={handleFileUpload}
-/>
+              {/* Hidden File Input */}
+              <input
+                type="file"
+                accept=".xlsx, .xls"
+                id="excel-upload"
+                style={{ display: "none" }}
+                onChange={handleFileUpload}
+              />
 
-{/* Upload Button */}
-<button
-  type="button"
-  className="upload-button"
-  onClick={() => document.getElementById("excel-upload").click()}
-  title="Excel file from device"
->
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M10 2V14M10 2L6 6M10 2L14 6M2 16H18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-  Upload Excel File
-</button>
+              {/* Upload Button */}
+              <button
+                type="button"
+                className="upload-button"
+                onClick={() => document.getElementById("excel-upload").click()}
+                title="Excel file from device"
+              >
+                <i class="fa-solid fa-file-arrow-up"></i>
+                Upload Excel File
+              </button>
 
-{/* Reload Button */}
-<button 
-  type="button"
-  className="reload-button"
-  onClick={handleReloadOriginal}
-  disabled={loading}
-  title="Reload original Excel file from assets"
->
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10C17 13.866 13.866 17 10 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M10 1V5M10 15V19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M1 10H5M15 10H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-  Reload Original
-</button>
+              {/* Reload Button */}
+              <button
+                type="button"
+                className="reload-button"
+                onClick={handleReloadOriginal}
+                disabled={loading}
+                title="Reload original Excel file from assets"
+              >
+                <i class="fa-solid fa-arrow-rotate-right"></i>
+                Reload Original
+              </button>
 
-</div>
+            </div>
             {opportunities.length > 0 && (
               <div className="file-info">
                 <span className="file-count">
-                  {filteredOpportunities.length === opportunities.length 
+                  {filteredOpportunities.length === opportunities.length
                     ? `${opportunities.length} opportunities loaded`
                     : `Showing ${filteredOpportunities.length} of ${opportunities.length} opportunities`
                   }
@@ -229,12 +292,56 @@ function ListingPage() {
           {opportunities.length > 0 && (
             <SearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
           )}
+          {/* ...........filters UI ................... */}
+          <div className="filters-container">
+
+            <select value={filters.type} onChange={(e) => setFilters({ ...filters, type: e.target.value })}>
+              <option value="">All Types</option>
+              <option>Internship</option>
+              <option>Research</option>
+              <option>Summer Program</option>
+            </select>
+
+            <select value={filters.season} onChange={(e) => setFilters({ ...filters, season: e.target.value })}>
+              <option value="">All Seasons</option>
+              <option>Summer</option>
+              <option>School Year</option>
+            </select>
+
+            <select value={filters.mode} onChange={(e) => setFilters({ ...filters, mode: e.target.value })}>
+              <option value="">All Modes</option>
+              <option>Remote</option>
+              <option>In Person</option>
+              <option>Hybrid</option>
+            </select>
+
+            <select value={filters.grade} onChange={(e) => setFilters({ ...filters, grade: e.target.value })}>
+              <option value="">All Grades</option>
+              <option>Freshman</option>
+              <option>Sophomore</option>
+              <option>Junior</option>
+              <option>Senior</option>
+              <option>Gap Year</option>
+            </select>
+
+            <select value={filters.age} onChange={(e) => setFilters({ ...filters, age: e.target.value })}>
+              <option value="">All Ages</option>
+              {[13, 14, 15, 16, 17, 18, 19].map(a =>
+                <option key={a}>{a}</option>
+              )}
+            </select>
+
+            <button style={{ backgroundColor: '#24c542' }} className="navbar-btn" onClick={() => applyFilters()}><i class="fa-solid fa-filter"></i> Apply Filters</button>
+            <button style={{ backgroundColor: '#c56224' }} className="navbar-btn" onClick={() => clearFilters()}><i class="fa-solid fa-times"></i> Clear Filters</button>
+
+
+          </div>
 
           {/* Error Message */}
           {error && (
             <div className="error-message">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M10 10V14M10 6H10.01M19 10C19 14.9706 14.9706 19 10 19C5.02944 19 1 14.9706 1 10C1 5.02944 5.02944 1 10 1C14.9706 1 19 5.02944 19 10Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M10 10V14M10 6H10.01M19 10C19 14.9706 14.9706 19 10 19C5.02944 19 1 14.9706 1 10C1 5.02944 5.02944 1 10 1C14.9706 1 19 5.02944 19 10Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               {error}
             </div>
@@ -253,9 +360,9 @@ function ListingPage() {
             <>
               <div className="opportunities-grid">
                 {currentOpportunities.map((opportunity, index) => (
-                  <OpportunityCard 
-                    key={opportunity.id} 
-                    opportunity={opportunity} 
+                  <OpportunityCard
+                    key={opportunity.id}
+                    opportunity={opportunity}
                     index={startIndex + index}
                     columnsToDisplay={COLUMNS_TO_DISPLAY}
                   />
@@ -282,8 +389,8 @@ function ListingPage() {
           {!loading && opportunities.length === 0 && !error && (
             <div className="empty-state">
               <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M32 8L8 20V44L32 56L56 44V20L32 8Z" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M32 32L8 20M32 32L56 20M32 32V56" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M32 8L8 20V44L32 56L56 44V20L32 8Z" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M32 32L8 20M32 32L56 20M32 32V56" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               <h3>No opportunities found</h3>
               <p>Upload an Excel file to get started</p>
@@ -294,7 +401,7 @@ function ListingPage() {
           {!loading && opportunities.length > 0 && filteredOpportunities.length === 0 && (
             <div className="empty-state">
               <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M29 29L35 35M32 24C28.134 24 25 27.134 25 31C25 34.866 28.134 38 32 38C35.866 38 39 34.866 39 31C39 27.134 35.866 24 32 24Z" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M29 29L35 35M32 24C28.134 24 25 27.134 25 31C25 34.866 28.134 38 32 38C35.866 38 39 34.866 39 31C39 27.134 35.866 24 32 24Z" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               <h3>No results found</h3>
               <p>Try adjusting your search query</p>

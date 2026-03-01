@@ -18,13 +18,85 @@ const HomePage = () => {
                     <button>Search</button>
                 </div>
             </div>
-            <div style={{ padding:"50px 20%",display: "flex", gap: "24px", flexWrap: "wrap" }}>
-                <div className="simple-card" onClick={() => navigate('/listings?category=internship')}>
+            <div style={{ padding: "50px 10%", display: "flex", gap: "24px", flexWrap: "wrap" }}>
+                <div className="simple-card" onClick={() => navigate('/listings')}>
                     <div className="simple-card-icon">
                         <i class="fa-brands fa-safari"></i>
                     </div>
                     <div className="simple-card-text">
                         Browse All
+                    </div>
+                </div>
+
+                <div className="simple-card" onClick={() => navigate('/listings?type=Internship')}>
+                    <div className="simple-card-icon">
+                        <i className="fa-solid fa-briefcase"></i>
+                    </div>
+                    <div className="simple-card-text">
+                        Internships
+                    </div>
+                </div>
+
+                <div className="simple-card" onClick={() => navigate('/listings?type=Research')}>
+                    <div className="simple-card-icon">
+                        <i className="fa-solid fa-flask"></i>
+                    </div>
+                    <div className="simple-card-text">
+                        Research
+                    </div>
+                </div>
+
+                <div className="simple-card" onClick={() => navigate('/listings?season=Summer')}>
+                    <div className="simple-card-icon">
+                        <i className="fa-solid fa-sun"></i>
+                    </div>
+                    <div className="simple-card-text">
+                        Summer Programs
+                    </div>
+                </div>
+
+                <div className="simple-card" onClick={() => navigate('/listings?mode=Remote')}>
+                    <div className="simple-card-icon">
+                        <i className="fa-solid fa-laptop"></i>
+                    </div>
+                    <div className="simple-card-text">
+                        Remote
+                    </div>
+                </div>
+
+                <div className="simple-card" onClick={() => navigate('/listings?interest=STEM')}>
+                    <div className="simple-card-icon">
+                        <i className="fa-solid fa-atom"></i>
+                    </div>
+                    <div className="simple-card-text">
+                        STEM
+                    </div>
+                </div>
+
+                <div className="simple-card" onClick={() => navigate('/listings?salary=Paid')}>
+                    <div className="simple-card-icon">
+                        <i className="fa-solid fa-money-bill-wave"></i>
+                    </div>
+                    <div className="simple-card-text">
+                        Paid Programs
+                    </div>
+                </div>
+
+                <div className="simple-card" onClick={() => navigate('/listings?grade=Junior')}>
+                    <div className="simple-card-icon">
+                        <i className="fa-solid fa-user-graduate"></i>
+                    </div>
+                    <div className="simple-card-text">
+                        High School
+                    </div>
+                </div>
+
+                <div className="simple-card" onClick={() => navigate('/listings?mode=In Person')}>
+                    <div className="simple-card-icon">
+                        <i className="fa-solid fa-location-dot"></i>
+                    </div>
+                    <div className="simple-card-text">
+                        In Person
                     </div>
                 </div>
 

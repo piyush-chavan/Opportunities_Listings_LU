@@ -179,5 +179,22 @@
   font-size: 16px;
   font-weight: 600;
   color: #1f2937;
+  line-height: 1.2;
+  /* color: #44e862; */
   text-align: center;
+}
+
+.filters-container {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.filters-container select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
 }
