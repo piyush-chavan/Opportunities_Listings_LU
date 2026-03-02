@@ -34,7 +34,11 @@ function ListingPage() {
     season: "",
     mode: "",
     grade: "",
-    age: ""
+    age: "",
+    openTo: "",
+    fee: "",
+    deadlineBefore: "",
+    deadlineSort: ""
   });
   const [isDarkMode, setIsDarkMode] = useState(() => {
     try {
@@ -64,7 +68,11 @@ function ListingPage() {
       season: searchParams.get("season") || "",
       mode: searchParams.get("mode") || "",
       grade: searchParams.get("grade") || "",
-      age: searchParams.get("age") || ""
+      age: searchParams.get("age") || "",
+      openTo: searchParams.get("openTo") || "",
+      fee: searchParams.get("fee") || "",
+      deadlineBefore: searchParams.get("deadlineBefore") || "",
+      deadlineSort: searchParams.get("deadlineSort") || ""
     });
   }, [searchParams]);
 
@@ -98,7 +106,16 @@ function ListingPage() {
         (!filters.season || opp["Season"]?.includes(filters.season)) &&
         (!filters.mode || opp["Mode"]?.includes(filters.mode)) &&
         (!filters.grade || opp["Grade"]?.includes(filters.grade)) &&
-        (!filters.age || opp["Age"]?.includes(filters.age))
+        (!filters.age || opp["Age"]?.includes(filters.age)) &&
+        (!filters.openTo || opp["This Opportunity is Only Open To"]?.includes(filters.openTo)) &&
+        (!filters.fee || opp["Program Fee/Tuition"]?.includes(filters.fee)) &&
+        (!filters.deadlineBefore || (() => {
+          const dl = opp["Application Deadline"] || '';
+          const m = dl.match(/\b(20\d{2})\b/);
+          if (!m) return false;
+          const year = Number(m[1]);
+          return year < Number(filters.deadlineBefore);
+        })())
       );
     });
 
@@ -110,6 +127,33 @@ function ListingPage() {
           if (value === null || value === undefined) return false;
           return String(value).toLowerCase().includes(query);
         });
+      });
+    }
+
+    // Sorting by deadline if requested
+    const parseDeadline = (dl) => {
+      if (!dl) return null;
+      // Try full date parse
+      const d = new Date(dl);
+      if (!isNaN(d.getTime())) return d;
+      // Try extract year
+      const m = String(dl).match(/\b(20\d{2})\b/);
+      if (m) return new Date(Number(m[1]), 0, 1);
+      return null;
+    };
+
+    if (filters.deadlineSort) {
+      result = result.slice().sort((a, b) => {
+        const da = parseDeadline(a["Application Deadline"] || '');
+        const db = parseDeadline(b["Application Deadline"] || '');
+        if (!da && !db) return 0;
+        if (!da) return 1;
+        if (!db) return -1;
+        if (filters.deadlineSort === 'oldest') {
+          return da - db;
+        }
+        // latest
+        return db - da;
       });
     }
 
@@ -188,16 +232,46 @@ function ListingPage() {
 
   const applyFilters = () => {
     const filteredOpportunities = opportunities.filter((opp) => {
+      const dl = opp["Application Deadline"] || '';
+      const m = dl.match(/\b(20\d{2})\b/);
+      const year = m ? Number(m[1]) : null;
+
+      const deadlineOk = !filters.deadlineBefore ? true : (year ? year < Number(filters.deadlineBefore) : false);
 
       return (
         (!filters.type || opp["Type of Opportunity"]?.includes(filters.type)) &&
         (!filters.season || opp["Season"]?.includes(filters.season)) &&
         (!filters.mode || opp["Mode"]?.includes(filters.mode)) &&
         (!filters.grade || opp["Grade"]?.includes(filters.grade)) &&
-        (!filters.age || opp["Age"]?.includes(filters.age))
+        (!filters.age || opp["Age"]?.includes(filters.age)) &&
+        (!filters.openTo || opp["This Opportunity is Only Open To"]?.includes(filters.openTo)) &&
+        (!filters.fee || opp["Program Fee/Tuition"]?.includes(filters.fee)) &&
+        deadlineOk
       );
-
     });
+
+    // apply deadline sorting if set
+    const parseDeadline = (dl) => {
+      if (!dl) return null;
+      const d = new Date(dl);
+      if (!isNaN(d.getTime())) return d;
+      const m = String(dl).match(/\b(20\d{2})\b/);
+      if (m) return new Date(Number(m[1]), 0, 1);
+      return null;
+    };
+
+    if (filters.deadlineSort) {
+      filteredOpportunities.sort((a, b) => {
+        const da = parseDeadline(a["Application Deadline"] || '');
+        const db = parseDeadline(b["Application Deadline"] || '');
+        if (!da && !db) return 0;
+        if (!da) return 1;
+        if (!db) return -1;
+        if (filters.deadlineSort === 'oldest') return da - db;
+        return db - da; // latest
+      });
+    }
+
     setFilteredOpportunities(filteredOpportunities);
   }
 
@@ -207,7 +281,10 @@ function ListingPage() {
       season: "",
       mode: "",
       grade: "",
-      age: ""
+      age: "",
+      openTo: "",
+      fee: "",
+      deadlineBefore: ""
     })
     setFilteredOpportunities(opportunities);
   }
@@ -217,6 +294,10 @@ function ListingPage() {
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const currentOpportunities = filteredOpportunities.slice(startIndex, endIndex);
+
+  // Build dynamic lists for some filter selects
+  const uniqueOpenTo = Array.from(new Set(opportunities.map(o => (o["This Opportunity is Only Open To"] || '').trim()).filter(Boolean))).sort();
+  const uniqueFees = Array.from(new Set(opportunities.map(o => (o["Program Fee/Tuition"] || '').trim()).filter(Boolean))).sort();
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -317,10 +398,10 @@ function ListingPage() {
 
             <select value={filters.grade} onChange={(e) => setFilters({ ...filters, grade: e.target.value })}>
               <option value="">All Grades</option>
-              <option>Freshman</option>
-              <option>Sophomore</option>
-              <option>Junior</option>
-              <option>Senior</option>
+              <option>9th (Freshman)</option>
+              <option>10th (Sophomore)</option>
+              <option>11th (Junior)</option>
+              <option>12th (Senior)</option>
               <option>Gap Year</option>
             </select>
 
@@ -331,9 +412,30 @@ function ListingPage() {
               )}
             </select>
 
+
+            <select value={filters.fee} onChange={(e) => setFilters({ ...filters, fee: e.target.value })}>
+              <option value="">All Fees</option>
+              {uniqueFees.map(v => <option key={v} value={v}>{v}</option>)}
+            </select>
+
+            <select value={filters.deadlineBefore} onChange={(e) => setFilters({ ...filters, deadlineBefore: e.target.value })}>
+              <option value="">All Deadlines</option>
+              <option value="2024">Before 2024</option>
+              <option value="2025">Before 2025</option>
+            </select>
+
+            <select value={filters.deadlineSort} onChange={(e) => setFilters({ ...filters, deadlineSort: e.target.value })}>
+              <option value="">Sort Deadlines</option>
+              <option value="oldest">Oldest Deadline</option>
+              <option value="latest">Latest Deadline</option>
+            </select>
+            <select value={filters.openTo} onChange={(e) => setFilters({ ...filters, openTo: e.target.value })}>
+              <option value="">All Open To</option>
+              {uniqueOpenTo.map(v => <option key={v} value={v}>{v}</option>)}
+            </select>
+
             <button style={{ backgroundColor: '#24c542' }} className="navbar-btn" onClick={() => applyFilters()}><i class="fa-solid fa-filter"></i> Apply Filters</button>
             <button style={{ backgroundColor: '#c56224' }} className="navbar-btn" onClick={() => clearFilters()}><i class="fa-solid fa-times"></i> Clear Filters</button>
-
 
           </div>
 
