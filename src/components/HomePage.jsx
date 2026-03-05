@@ -37,6 +37,15 @@ const HomePage = () => {
                     </div>
                 </div>
 
+                <div className="simple-card" onClick={() => navigate('/summer_programs')}>
+                    <div className="simple-card-icon">
+                        <i className="fa-solid fa-sun"></i>
+                    </div>
+                    <div className="simple-card-text">
+                        LU Summer Programs
+                    </div>
+                </div>
+
                 <div className="simple-card" onClick={() => navigate('/listings?type=Research')}>
                     <div className="simple-card-icon">
                         <i className="fa-solid fa-flask"></i>

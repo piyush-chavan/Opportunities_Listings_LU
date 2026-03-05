@@ -350,3 +350,14 @@ body {
     align-items: flex-start;
   }
 }
+
+.summer-programs-filters-container select {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 14px;
+  transition: all 0.25s ease;
+  max-width: 300px;
+}

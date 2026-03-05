@@ -316,6 +316,7 @@
 import React from 'react';
 import Navbar from './components/Navbar';
 import ListingPage from './components/ListingPage';
+import SummerProgramsListing from './components/SummerProgramsListing';
 import { HashRouter as Router,Route,Routes } from 'react-router-dom';
 import './App.css';
 import Footer from './components/Footer';
@@ -329,6 +330,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/listings" element={<ListingPage />} />
+          <Route path="/summer_programs" element={<SummerProgramsListing />} />
         </Routes>
         <Footer/>
       </div>

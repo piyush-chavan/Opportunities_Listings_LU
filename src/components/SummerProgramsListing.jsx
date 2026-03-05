@@ -1,0 +1,337 @@
+import React, { useState, useEffect } from 'react';
+import OpportunityCardInternship from './OpportunityCardInternship';
+import Pagination from './Pagination';
+import ThemeToggle from './ThemeToggle';
+import SearchBar from './SearchBar';
+import { loadExcelSheetFromAssets } from '../utils/excelParser';
+import '../App.css';
+import { useSearchParams } from 'react-router-dom';
+
+const ITEMS_PER_PAGE = 12;
+const EXCEL_FILE_NAME = 'LU Mastersheet.xlsx';
+const SHEET_NAME = 'Summer Programs';
+
+function SummerProgramsListing() {
+  const [opportunities, setOpportunities] = useState([]);
+  const [filteredOpportunities, setFilteredOpportunities] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [filters, setFilters] = useState({
+    luRating: '',
+    luRemarks: '',
+    programValue: '',
+    notes: '',
+    programName: '',
+    host: '',
+    country: '',
+    subjectStream: '',
+    subjectDetails: '',
+    subject: '',
+    dataYear: '',
+    eligibility: '',
+    geographicAccess: '',
+    residency: '',
+    citizenship: '',
+    enrollmentRule: '',
+    age: '',
+    grade: '',
+    format: '',
+    formatDetails: '',
+    duration: '',
+    applicationBefore: '',
+    allDeadlines: '',
+    officialLink: '',
+    cost: '',
+    costDetails: '',
+    selectivity: '',
+    source: '',
+    tagging: ''
+  });
+  const [uiFilters, setUiFilters] = useState(() => ({
+    luRating: '', luRemarks: '', programValue: '', notes: '', programName: '', host: '', country: '', subjectStream: '', subjectDetails: '', subject: '', dataYear: '', eligibility: '', geographicAccess: '', residency: '', citizenship: '', enrollmentRule: '', age: '', grade: '', format: '', formatDetails: '', duration: '', applicationBefore: '', allDeadlines: '', officialLink: '', cost: '', costDetails: '', selectivity: '', source: '', tagging: ''
+  }));
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    try {
+      const saved = localStorage.getItem('darkMode');
+      return saved ? JSON.parse(saved) : false;
+    } catch (e) {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    const params = {};
+    Object.keys(filters).forEach((key) => {
+      if (filters[key]) params[key] = filters[key];
+    });
+    setSearchParams(params);
+  }, [filters]);
+
+  useEffect(() => {
+    setFilters({
+      luRating: searchParams.get('luRating') || '',
+      luRemarks: searchParams.get('luRemarks') || '',
+      programValue: searchParams.get('programValue') || '',
+      host: searchParams.get('host') || '',
+      country: searchParams.get('country') || '',
+      subjectStream: searchParams.get('subjectStream') || '',
+      subject: searchParams.get('subject') || '',
+      dataYear: searchParams.get('dataYear') || '',
+      residency: searchParams.get('residency') || '',
+      citizenship: searchParams.get('citizenship') || '',
+      age: searchParams.get('age') || '',
+      grade: searchParams.get('grade') || '',
+      format: searchParams.get('format') || '',
+      duration: searchParams.get('duration') || '',
+      applicationBefore: searchParams.get('applicationBefore') || '',
+      cost: searchParams.get('cost') || '',
+      selectivity: searchParams.get('selectivity') || '',
+      source: searchParams.get('source') || '',
+      tagging: searchParams.get('tagging') || ''
+    });
+    // keep UI in sync with filters when route params change
+    setUiFilters({
+      luRating: searchParams.get('luRating') || '',
+      luRemarks: searchParams.get('luRemarks') || '',
+      programValue: searchParams.get('programValue') || '',
+      host: searchParams.get('host') || '',
+      country: searchParams.get('country') || '',
+      subjectStream: searchParams.get('subjectStream') || '',
+      subject: searchParams.get('subject') || '',
+      dataYear: searchParams.get('dataYear') || '',
+      residency: searchParams.get('residency') || '',
+      citizenship: searchParams.get('citizenship') || '',
+      age: searchParams.get('age') || '',
+      grade: searchParams.get('grade') || '',
+      format: searchParams.get('format') || '',
+      duration: searchParams.get('duration') || '',
+      applicationBefore: searchParams.get('applicationBefore') || '',
+      cost: searchParams.get('cost') || '',
+      selectivity: searchParams.get('selectivity') || '',
+      source: searchParams.get('source') || '',
+      tagging: searchParams.get('tagging') || ''
+    });
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (isDarkMode) document.documentElement.setAttribute('data-theme', 'dark');
+    else document.documentElement.removeAttribute('data-theme');
+    try { localStorage.setItem('darkMode', JSON.stringify(isDarkMode)); } catch (e) {}
+  }, [isDarkMode]);
+
+  useEffect(() => { loadInitialData(); }, []);
+
+  useEffect(() => {
+    let result = opportunities || [];
+    if (filters.luRating) result = result.filter(o => (o['LU Rating'] || '').toLowerCase().includes(filters.luRating.toLowerCase()));
+    if (filters.luRemarks) result = result.filter(o => (o['LU Remarks'] || '').toLowerCase().includes(filters.luRemarks.toLowerCase()));
+    if (filters.programValue) result = result.filter(o => (o['Program Value'] || '').toLowerCase().includes(filters.programValue.toLowerCase()));
+    if (filters.host) result = result.filter(o => (o['Host Institution / Organizer'] || '').toLowerCase().includes(filters.host.toLowerCase()));
+    if (filters.country) result = result.filter(o => (o['Country'] || '').toLowerCase().includes(filters.country.toLowerCase()));
+    if (filters.subjectStream) result = result.filter(o => (o['Subject Stream'] || '').toLowerCase().includes(filters.subjectStream.toLowerCase()));
+    if (filters.subject) result = result.filter(o => (o['Subject'] || '').toLowerCase().includes(filters.subject.toLowerCase()));
+    if (filters.dataYear) result = result.filter(o => (o['Data Year'] || '').toLowerCase().includes(filters.dataYear.toLowerCase()));
+    if (filters.residency) result = result.filter(o => (o['Residency'] || '').toLowerCase().includes(filters.residency.toLowerCase()));
+    if (filters.citizenship) result = result.filter(o => (o['Citizenship'] || '').toLowerCase().includes(filters.citizenship.toLowerCase()));
+    if (filters.age) result = result.filter(o => (o['Age'] || '').toLowerCase().includes(filters.age.toLowerCase()));
+    if (filters.grade) result = result.filter(o => (o['Grade'] || '').toLowerCase().includes(filters.grade.toLowerCase()));
+    if (filters.format) result = result.filter(o => (o['Format'] || o['Format Details'] || '').toLowerCase().includes(filters.format.toLowerCase()));
+    if (filters.duration) result = result.filter(o => (o['Duration/Timeline'] || o['Duration / Timeline'] || '').toLowerCase().includes(filters.duration.toLowerCase()));
+    if (filters.selectivity) result = result.filter(o => (o['Selectivity'] || '').toLowerCase().includes(filters.selectivity.toLowerCase()));
+    if (filters.cost) result = result.filter(o => (o['Cost'] || '').toLowerCase().includes(filters.cost.toLowerCase()));
+    if (filters.source) result = result.filter(o => (o['Source'] || '').toLowerCase().includes(filters.source.toLowerCase()));
+    if (filters.tagging) result = result.filter(o => (o['Tagging'] || '').toLowerCase().includes(filters.tagging.toLowerCase()));
+    if (filters.applicationBefore) {
+      result = result.filter(o => {
+        const dl = o['Application Deadline'] || o['All Deadlines'] || '';
+        const m = String(dl).match(/\b(20\d{2})\b/);
+        if (!m) return false;
+        const year = Number(m[1]);
+        return year < Number(filters.applicationBefore);
+      });
+    }
+
+    if (searchQuery && searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      result = result.filter(opportunity => Object.values(opportunity).some(v => String(v || '').toLowerCase().includes(q)));
+    }
+
+    setFilteredOpportunities(result);
+    setCurrentPage(1);
+  }, [searchQuery, filters, opportunities]);
+
+  // Apply UI filters when user clicks Apply
+  const applyUiFilters = () => {
+    setFilters({ ...uiFilters });
+  };
+
+  const clearUiFilters = () => {
+    const empty = Object.keys(uiFilters).reduce((acc, k) => ({ ...acc, [k]: '' }), {});
+    setUiFilters(empty);
+    setFilters(empty);
+  };
+
+  const loadInitialData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await loadExcelSheetFromAssets(EXCEL_FILE_NAME, SHEET_NAME);
+      setOpportunities(data);
+      setFilteredOpportunities(data);
+      if (data.length > 0) {
+        const availableColumns = Object.keys(data[0]).filter(k => k !== 'id');
+        console.log('Summer Program columns:', availableColumns);
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Could not load summer programs sheet. Confirm LU Mastersheet.xlsx exists in public/assets and has a sheet named "Summer Program"');
+      setOpportunities([]);
+      setFilteredOpportunities([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReloadOriginal = async () => { setSearchQuery(''); await loadInitialData(); };
+
+  const totalPages = Math.ceil(filteredOpportunities.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const currentOpportunities = filteredOpportunities.slice(startIndex, endIndex);
+
+  const uniqueCountries = Array.from(new Set(opportunities.map(o => (o['Country']||'').trim()).filter(Boolean))).sort();
+  const uniqueSubjects = Array.from(new Set(opportunities.map(o => ((o['Subject']||o['Subject(s) Details from SOURCE']||'')).trim()).filter(Boolean))).sort();
+  const uniqueFormats = Array.from(new Set(opportunities.map(o => ((o['Format']||o['Format Details']||'')).trim()).filter(Boolean))).sort();
+  const uniqueGrades = Array.from(new Set(opportunities.map(o => (o['Grade']||'').trim()).filter(Boolean))).sort();
+  const uniqueAges = Array.from(new Set(opportunities.map(o => (o['Age']||'').trim()).filter(Boolean))).sort();
+  const uniqueSelectivity = Array.from(new Set(opportunities.map(o => (o['Selectivity']||'').trim()).filter(Boolean))).sort();
+  const uniqueHosts = Array.from(new Set(opportunities.map(o => (o['Host Institution / Organizer']||'').trim()).filter(Boolean))).sort();
+  const uniqueEligibility = Array.from(new Set(opportunities.map(o => (o['Eligibility Details from SOURCE']||o['Eligibility']||'').trim()).filter(Boolean))).sort();
+  const uniqueResidency = Array.from(new Set(opportunities.map(o => (o['Residency']||'').trim()).filter(Boolean))).sort();
+  const uniqueCitizenship = Array.from(new Set(opportunities.map(o => (o['Citizenship']||'').trim()).filter(Boolean))).sort();
+  const uniqueEnrollment = Array.from(new Set(opportunities.map(o => (o['Enrollment Rule (School)']||'').trim()).filter(Boolean))).sort();
+  const uniqueDurations = Array.from(new Set(opportunities.map(o => ((o['Duration/Timeline']||o['Duration / Timeline']||'')).trim()).filter(Boolean))).sort();
+  const uniqueProgramValues = Array.from(new Set(opportunities.map(o => (o['Program Value']||'').trim()).filter(Boolean))).sort();
+  const uniqueDataYears = Array.from(new Set(opportunities.map(o => (o['Data Year']||'').trim()).filter(Boolean))).sort();
+
+  return (
+    <div className="app">
+      <header className="app-header">
+        <div className="container">
+          <div className="header-content">
+            <div>
+              <p className="app-subtitle">Summer Programs</p>
+            </div>
+            <ThemeToggle isDarkMode={isDarkMode} onToggle={() => setIsDarkMode(!isDarkMode)} />
+          </div>
+        </div>
+      </header>
+
+      <main className="app-main">
+        <div className="container">
+          <div className="upload-section">
+            <div className="upload-buttons">
+              <button type="button" className="reload-button" onClick={handleReloadOriginal} disabled={loading}>Reload Summer Programs</button>
+            </div>
+            {opportunities.length > 0 && (
+              <div className="file-info"><span className="file-count">{filteredOpportunities.length} summer programs</span></div>
+            )}
+          </div>
+
+          {opportunities.length > 0 && (<SearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />)}
+
+          <div className="filters-container summer-programs-filters-container">
+            <select value={uiFilters.host} onChange={(e)=> setUiFilters({...uiFilters, host: e.target.value})}>
+              <option value="">All Hosts</option>
+              {uniqueHosts.map(h => <option key={h} value={h}>{h}</option>)}
+            </select>
+
+            <select value={uiFilters.country} onChange={(e) => setUiFilters({ ...uiFilters, country: e.target.value })}>
+              <option value="">All Countries</option>
+              {uniqueCountries.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+
+            <select value={uiFilters.subject} onChange={(e) => setUiFilters({ ...uiFilters, subject: e.target.value })}>
+              <option value="">All Subjects</option>
+              {uniqueSubjects.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+
+            <select value={uiFilters.format} onChange={(e) => setUiFilters({ ...uiFilters, format: e.target.value })}>
+              <option value="">All Formats</option>
+              {uniqueFormats.map(f => <option key={f} value={f}>{f}</option>)}
+            </select>
+
+            <select value={uiFilters.grade} onChange={(e) => setUiFilters({ ...uiFilters, grade: e.target.value })}>
+              <option value="">All Grades</option>
+              {uniqueGrades.map(g => <option key={g} value={g}>{g}</option>)}
+            </select>
+
+            <select value={uiFilters.age} onChange={(e) => setUiFilters({ ...uiFilters, age: e.target.value })}>
+              <option value="">All Ages</option>
+              {uniqueAges.map(a => <option key={a} value={a}>{a}</option>)}
+            </select>
+
+            
+
+            <select value={uiFilters.residency} onChange={(e)=> setUiFilters({...uiFilters, residency: e.target.value})}>
+              <option value="">All Residency</option>
+              {uniqueResidency.map(v => <option key={v} value={v}>{v}</option>)}
+            </select>
+
+            <select value={uiFilters.citizenship} onChange={(e)=> setUiFilters({...uiFilters, citizenship: e.target.value})}>
+              <option value="">All Citizenship</option>
+              {uniqueCitizenship.map(v => <option key={v} value={v}>{v}</option>)}
+            </select>
+
+            <select value={uiFilters.duration} onChange={(e)=> setUiFilters({...uiFilters, duration: e.target.value})}>
+              <option value="">All Durations</option>
+              {uniqueDurations.map(v => <option key={v} value={v}>{v}</option>)}
+            </select>
+
+           
+
+            <select value={uiFilters.dataYear} onChange={(e)=> setUiFilters({...uiFilters, dataYear: e.target.value})}>
+              <option value="">All Years</option>
+              {uniqueDataYears.map(v => <option key={v} value={v}>{v}</option>)}
+            </select>
+
+            <select value={uiFilters.selectivity} onChange={(e) => setUiFilters({ ...uiFilters, selectivity: e.target.value })}>
+              <option value="">All Selectivity</option>
+              {uniqueSelectivity.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button className="navbar-btn" style={{ backgroundColor: '#24c542' }} onClick={applyUiFilters}>Apply Filters</button>
+              <button className="navbar-btn" style={{ backgroundColor: '#c56224' }} onClick={clearUiFilters}>Clear Filters</button>
+            </div>
+
+          </div>
+
+          {error && <div className="error-message">{error}</div>}
+          {loading && <div className="loading-container"><div className="spinner"></div><p>Loading summer programs...</p></div>}
+
+          {!loading && filteredOpportunities.length > 0 && (
+            <>
+              <div className="opportunities-grid">
+                {currentOpportunities.map((opportunity, index) => (
+                  <OpportunityCardInternship key={opportunity.id} opportunity={opportunity} index={startIndex + index} />
+                ))}
+              </div>
+              {totalPages > 1 && (<Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={(p)=>{setCurrentPage(p); window.scrollTo({top:0,behavior:'smooth'})}} />)}
+            </>
+          )}
+
+          {!loading && opportunities.length === 0 && !error && (
+            <div className="empty-state"><h3>No summer programs found</h3><p>Reload or add LU Mastersheet.xlsx with an "Summer Programs" sheet.</p></div>
+          )}
+        </div>
+      </main>
+    </div>
+  );
+}
+
+export default SummerProgramsListing;
