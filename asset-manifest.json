@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.css": "/Opportunities_Listings_LU/static/css/main.04a7d7a7.css",
-    "main.js": "/Opportunities_Listings_LU/static/js/main.99d27cf8.js",
+    "main.css": "/Opportunities_Listings_LU/static/css/main.6b34cd0a.css",
+    "main.js": "/Opportunities_Listings_LU/static/js/main.83b7f84a.js",
     "static/media/LU_logo.png": "/Opportunities_Listings_LU/static/media/LU_logo.2c50b4e0721b1ef6bdbf.png",
     "index.html": "/Opportunities_Listings_LU/index.html",
-    "main.04a7d7a7.css.map": "/Opportunities_Listings_LU/static/css/main.04a7d7a7.css.map",
-    "main.99d27cf8.js.map": "/Opportunities_Listings_LU/static/js/main.99d27cf8.js.map"
+    "main.6b34cd0a.css.map": "/Opportunities_Listings_LU/static/css/main.6b34cd0a.css.map",
+    "main.83b7f84a.js.map": "/Opportunities_Listings_LU/static/js/main.83b7f84a.js.map"
   },
   "entrypoints": [
-    "static/css/main.04a7d7a7.css",
-    "static/js/main.99d27cf8.js"
+    "static/css/main.6b34cd0a.css",
+    "static/js/main.83b7f84a.js"
   ]
 }
