@@ -11,6 +11,113 @@ const ITEMS_PER_PAGE = 12;
 const EXCEL_FILE_NAME = 'LU Mastersheet.xlsx';
 const SHEET_NAME = 'Summer Programs';
 
+// Helper: parse age strings into array of integers (individual ages)
+const parseAgeString = (s) => {
+  if (!s) return [];
+  const raw = String(s).trim();
+  const nums = raw.match(/\d+/g) || [];
+  // handle formats like '13-15'
+  if (raw.includes('-') && nums.length >= 2) {
+    const start = Number(nums[0]);
+    const end = Number(nums[1]);
+    if (Number.isFinite(start) && Number.isFinite(end) && end >= start) {
+      const out = [];
+      for (let i = start; i <= end; i++) out.push(i);
+      return out;
+    }
+  }
+  // handle '16+' etc. cap upper limit to 18
+  if (raw.includes('+') && nums.length >= 1) {
+    const start = Number(nums[0]);
+    const upper = 18;
+    if (Number.isFinite(start)) {
+      const out = [];
+      for (let i = start; i <= upper; i++) out.push(i);
+      return out;
+    }
+  }
+  // handle '<8' style: keep lower limit to 6 and upper to num-1
+  if (/^\s*<\s*\d+/.test(raw) && nums.length >= 1) {
+    const limit = Number(nums[0]);
+    const lower = 6;
+    const upper = Math.max(lower, limit - 1);
+    const out = [];
+    for (let i = lower; i <= upper; i++) out.push(i);
+    return out;
+  }
+  // comma separated or list of numbers
+  if (nums.length >= 1) {
+    return Array.from(new Set(nums.map(n => Number(n)).filter(n => Number.isFinite(n)))).sort((a,b)=>a-b);
+  }
+  return [];
+};
+
+// Helper: parse grade strings into array of integers (individual grades)
+const parseGradeString = (s) => {
+  if (!s) return [];
+  const raw = String(s).trim();
+  const nums = raw.match(/\d+/g) || [];
+  if (raw.includes('-') && nums.length >= 2) {
+    const start = Number(nums[0]);
+    const end = Number(nums[1]);
+    if (Number.isFinite(start) && Number.isFinite(end) && end >= start) {
+      const out = [];
+      for (let i = start; i <= end; i++) out.push(i);
+      return out;
+    }
+  }
+  if (raw.includes('+') && nums.length >= 1) {
+    const start = Number(nums[0]);
+    const upper = 12; // assume grade cap at 12
+    if (Number.isFinite(start)) {
+      const out = [];
+      for (let i = start; i <= upper; i++) out.push(i);
+      return out;
+    }
+  }
+  if (nums.length >= 1) {
+    return Array.from(new Set(nums.map(n => Number(n)).filter(n => Number.isFinite(n)))).sort((a,b)=>a-b);
+  }
+  return [];
+};
+
+// Helper: normalize deadline strings to YYYY-MM-DD when possible, fallback to year or original trimmed
+const monthMap = { jan:1, feb:2, mar:3, apr:4, may:5, jun:6, jul:7, aug:8, sep:9, sept:9, oct:10, nov:11, dec:12 };
+const normalizeDeadline = (s) => {
+  if (!s) return '';
+  const raw = String(s).trim();
+  // try month name patterns like 'Aug 15 2024' or '15 Aug 2024'
+  let m = raw.match(/([A-Za-z]+)\s+(\d{1,2}),?\s*(20\d{2})/);
+  if (m) {
+    const mon = monthMap[m[1].toLowerCase().slice(0,3)];
+    const day = Number(m[2]);
+    const year = Number(m[3]);
+    if (mon && day && year) return `${year.toString().padStart(4,'0')}-${String(mon).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+  }
+  m = raw.match(/(\d{1,2})\s+([A-Za-z]+)\s*(20\d{2})/);
+  if (m) {
+    const day = Number(m[1]);
+    const mon = monthMap[m[2].toLowerCase().slice(0,3)];
+    const year = Number(m[3]);
+    if (mon && day && year) return `${year.toString().padStart(4,'0')}-${String(mon).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+  }
+  // try numeric D/M/Y or M/D/Y formats like 15/08/2024 or 08-15-2024
+  m = raw.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](20\d{2})/);
+  if (m) {
+    // we can't be sure of order; assume day/month/year if day>12 else month/day/year is ambiguous.
+    let a = Number(m[1]);
+    let b = Number(m[2]);
+    const year = Number(m[3]);
+    let day = a, mon = b;
+    if (a > 12) { day = a; mon = b; } else if (b > 12) { day = b; mon = a; } else { day = a; mon = b; }
+    return `${year.toString().padStart(4,'0')}-${String(mon).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+  }
+  // try to extract a year
+  m = raw.match(/(20\d{2})/);
+  if (m) return m[1];
+  return raw;
+};
+
 function SummerProgramsListing() {
   const [opportunities, setOpportunities] = useState([]);
   const [filteredOpportunities, setFilteredOpportunities] = useState([]);
@@ -137,8 +244,14 @@ function SummerProgramsListing() {
     if (filters.dataYear) result = result.filter(o => (o['Data Year'] || '').toLowerCase().includes(filters.dataYear.toLowerCase()));
     if (filters.residency) result = result.filter(o => (o['Residency'] || '').toLowerCase().includes(filters.residency.toLowerCase()));
     if (filters.citizenship) result = result.filter(o => (o['Citizenship'] || '').toLowerCase().includes(filters.citizenship.toLowerCase()));
-    if (filters.age) result = result.filter(o => (o['Age'] || '').toLowerCase().includes(filters.age.toLowerCase()));
-    if (filters.grade) result = result.filter(o => (o['Grade'] || '').toLowerCase().includes(filters.grade.toLowerCase()));
+    if (filters.age) {
+      const sel = Number(filters.age);
+      result = result.filter(o => Array.isArray(o._ageList) && o._ageList.includes(sel));
+    }
+    if (filters.grade) {
+      const sel = Number(filters.grade);
+      result = result.filter(o => Array.isArray(o._gradeList) && o._gradeList.includes(sel));
+    }
     if (filters.format) result = result.filter(o => (o['Format'] || o['Format Details'] || '').toLowerCase().includes(filters.format.toLowerCase()));
     if (filters.duration) result = result.filter(o => (o['Duration/Timeline'] || o['Duration / Timeline'] || '').toLowerCase().includes(filters.duration.toLowerCase()));
     if (filters.selectivity) result = result.filter(o => (o['Selectivity'] || '').toLowerCase().includes(filters.selectivity.toLowerCase()));
@@ -180,8 +293,24 @@ function SummerProgramsListing() {
     setError(null);
     try {
       const data = await loadExcelSheetFromAssets(EXCEL_FILE_NAME, SHEET_NAME);
-      setOpportunities(data);
-      setFilteredOpportunities(data);
+      // Normalize ages, grades and deadlines for consistent filtering/display
+      const processed = data.map((opp) => {
+        const copy = { ...opp };
+        try {
+          copy._ageList = parseAgeString(copy['Age'] || copy['Ages'] || '');
+        } catch (e) { copy._ageList = []; }
+        try {
+          copy._gradeList = parseGradeString(copy['Grade'] || '');
+        } catch (e) { copy._gradeList = []; }
+        // Normalize deadlines
+        const rawDl = copy['Application Deadline'] || copy['All Deadlines'] || '';
+        copy['Application Deadline'] = normalizeDeadline(rawDl);
+        copy['All Deadlines'] = normalizeDeadline(copy['All Deadlines'] || '');
+        return copy;
+      });
+
+      setOpportunities(processed);
+      setFilteredOpportunities(processed);
       if (data.length > 0) {
         const availableColumns = Object.keys(data[0]).filter(k => k !== 'id');
         console.log('Summer Program columns:', availableColumns);
@@ -206,8 +335,11 @@ function SummerProgramsListing() {
   const uniqueCountries = Array.from(new Set(opportunities.map(o => (o['Country']||'').trim()).filter(Boolean))).sort();
   const uniqueSubjects = Array.from(new Set(opportunities.map(o => ((o['Subject']||o['Subject(s) Details from SOURCE']||'')).trim()).filter(Boolean))).sort();
   const uniqueFormats = Array.from(new Set(opportunities.map(o => ((o['Format']||o['Format Details']||'')).trim()).filter(Boolean))).sort();
-  const uniqueGrades = Array.from(new Set(opportunities.map(o => (o['Grade']||'').trim()).filter(Boolean))).sort();
-  const uniqueAges = Array.from(new Set(opportunities.map(o => (o['Age']||'').trim()).filter(Boolean))).sort();
+  const allGrades = opportunities.flatMap(o => (o._gradeList || []));
+  const uniqueGrades = Array.from(new Set(allGrades)).sort((a,b)=>a-b).map(String);
+  // derive individual ages from parsed age lists
+  const allAges = opportunities.flatMap(o => (o._ageList || []));
+  const uniqueAges = Array.from(new Set(allAges)).sort((a,b)=>a-b).map(String);
   const uniqueSelectivity = Array.from(new Set(opportunities.map(o => (o['Selectivity']||'').trim()).filter(Boolean))).sort();
   const uniqueHosts = Array.from(new Set(opportunities.map(o => (o['Host Institution / Organizer']||'').trim()).filter(Boolean))).sort();
   const uniqueEligibility = Array.from(new Set(opportunities.map(o => (o['Eligibility Details from SOURCE']||o['Eligibility']||'').trim()).filter(Boolean))).sort();
@@ -235,10 +367,15 @@ function SummerProgramsListing() {
         <div className="container">
           <div className="upload-section">
             <div className="upload-buttons">
-              <button type="button" className="reload-button" onClick={handleReloadOriginal} disabled={loading}>Reload Summer Programs</button>
+              <button type="button" className="reload-button" onClick={handleReloadOriginal} disabled={loading}><i class="fa-solid fa-arrow-rotate-right"></i> Reload Summer Programs</button>
             </div>
             {opportunities.length > 0 && (
-              <div className="file-info"><span className="file-count">{filteredOpportunities.length} summer programs</span></div>
+              <div className="file-info"><span className="file-count">
+                  {filteredOpportunities.length === opportunities.length
+                    ? `${opportunities.length} summer programs loaded`
+                    : `Showing ${filteredOpportunities.length} of ${opportunities.length} summer programs`
+                  }
+                </span></div>
             )}
           </div>
 
@@ -287,15 +424,15 @@ function SummerProgramsListing() {
               {uniqueCitizenship.map(v => <option key={v} value={v}>{v}</option>)}
             </select>
 
-            <select value={uiFilters.duration} onChange={(e)=> setUiFilters({...uiFilters, duration: e.target.value})}>
+            {/* <select value={uiFilters.duration} onChange={(e)=> setUiFilters({...uiFilters, duration: e.target.value})}>
               <option value="">All Durations</option>
               {uniqueDurations.map(v => <option key={v} value={v}>{v}</option>)}
-            </select>
+            </select> */}
 
            
 
             <select value={uiFilters.dataYear} onChange={(e)=> setUiFilters({...uiFilters, dataYear: e.target.value})}>
-              <option value="">All Years</option>
+              <option value="">Data Years</option>
               {uniqueDataYears.map(v => <option key={v} value={v}>{v}</option>)}
             </select>
 
@@ -305,8 +442,8 @@ function SummerProgramsListing() {
             </select>
 
             <div style={{ display: 'flex', gap: 8 }}>
-              <button className="navbar-btn" style={{ backgroundColor: '#24c542' }} onClick={applyUiFilters}>Apply Filters</button>
-              <button className="navbar-btn" style={{ backgroundColor: '#c56224' }} onClick={clearUiFilters}>Clear Filters</button>
+              <button className="navbar-btn" style={{ backgroundColor: '#24c542' }} onClick={applyUiFilters}><i class="fa-solid fa-filter"></i> Apply Filters</button>
+              <button className="navbar-btn" style={{ backgroundColor: '#c56224' }} onClick={clearUiFilters}><i class="fa-solid fa-times"></i> Clear Filters</button>
             </div>
 
           </div>

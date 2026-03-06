@@ -46,6 +46,7 @@ const OpportunityCardInternship = ({ opportunity, index }) => {
                 {opportunity['Cost Details'] && <p className="card-text"><b>Cost Details:</b> {opportunity['Cost Details']}</p>}
 
                 {opportunity['Subject'] && <p className="card-text"><b>Subject:</b> {opportunity['Subject']}</p>}
+                {opportunity['Subject Stream'] && <p className="card-text"><b>Subject Stream:</b> {opportunity['Subject Stream']}</p>}
                 {opportunity['Age'] && <p className="card-text"><b>Age:</b> {opportunity['Age']}</p>}
                 {opportunity['Grade'] && <p className="card-text"><b>Grade:</b> {opportunity['Grade']}</p>}
                 {opportunity['Selectivity'] && <p className="card-text"><b>Selectivity:</b> {opportunity['Selectivity']}</p>}
@@ -54,7 +55,7 @@ const OpportunityCardInternship = ({ opportunity, index }) => {
                 {opportunity['LU Rating'] && <p className="card-text"><b>LU Rating:</b> {opportunity['LU Rating']}</p>}
                 {opportunity['LU Remarks'] && <p className="card-text"><b>LU Remarks:</b> {opportunity['LU Remarks']}</p>}
                 {opportunity['Notes'] && <p className="card-text"><b>Notes:</b> {opportunity['Notes']}</p>}
-                {opportunity['Source'] && <p className="card-text"><b>Source:</b> {opportunity['Source']}</p>}
+                {/* {opportunity['Source'] && <p className="card-text"><b>Source:</b> {opportunity['Source']}</p>} */}
                 {opportunity['Tagging'] && <p className="card-text"><b>Tags:</b> {opportunity['Tagging']}</p>}
                 {opportunity['Official Link'] && (
                     <a target="_blank" rel="noreferrer" href={opportunity['Official Link']} className='card-text mui-button'>

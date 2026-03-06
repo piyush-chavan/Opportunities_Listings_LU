@@ -1,0 +1,35 @@
+[33mcommit 36eeded178b67936e98c6295669a5d6fdfca265a[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m)[m
+Author: Piyush_Chavan <piyushchavangd2004@gmail.com>
+Date:   Thu Mar 5 23:36:37 2026 +0530
+
+    Summer programs sheet from LU Mastersheet Database added on new page '/summer_programs' and filters and card format for it is created and working properly
+
+[33mcommit 1c44eef83b858d47bcfbc332384c4cf8a904d626[m[33m ([m[1;31morigin/master[m[33m)[m
+Author: Piyush_Chavan <piyushchavangd2004@gmail.com>
+Date:   Mon Mar 2 21:39:32 2026 +0530
+
+    Some more useful filters added, sorting deadline wise function
+
+[33mcommit 98c5595a26340e109e1ad964994f57f910e1f97b[m
+Author: Piyush_Chavan <piyushchavangd2004@gmail.com>
+Date:   Mon Mar 2 03:11:54 2026 +0530
+
+    Filters for multiple optins added on listings page,apply/clear,multiple cards for direct landing with a query added on homepage,query paremter based routing implemented,improvements in UI/Design and minor fixes
+
+[33mcommit 1f624b1c5c53d06a0446848b601a3eca5f866324[m
+Author: Piyush_Chavan <piyushchavangd2004@gmail.com>
+Date:   Sat Feb 28 22:09:59 2026 +0530
+
+    Added HomePage,Footer and Navbar,Navigation,Minor Improvements,Design fixes,Hash Routing done
+
+[33mcommit 802f548ed4a671270c660d486bd2a8f75a1d5165[m
+Author: Piyush_Chavan <piyushchavangd2004@gmail.com>
+Date:   Fri Feb 20 03:11:51 2026 +0530
+
+    Version 1.0.0
+
+[33mcommit 13c5988b5f9578c12c320b9ffc17939589b79d67[m
+Author: Piyush_Chavan <piyushchavangd2004@gmail.com>
+Date:   Fri Feb 20 02:50:35 2026 +0530
+
+    Version 1
