@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/Opportunities_Listings_LU/static/css/main.6b34cd0a.css",
-    "main.js": "/Opportunities_Listings_LU/static/js/main.83b7f84a.js",
+    "main.js": "/Opportunities_Listings_LU/static/js/main.4f3268ab.js",
     "static/media/LU_logo.png": "/Opportunities_Listings_LU/static/media/LU_logo.2c50b4e0721b1ef6bdbf.png",
     "index.html": "/Opportunities_Listings_LU/index.html",
     "main.6b34cd0a.css.map": "/Opportunities_Listings_LU/static/css/main.6b34cd0a.css.map",
-    "main.83b7f84a.js.map": "/Opportunities_Listings_LU/static/js/main.83b7f84a.js.map"
+    "main.4f3268ab.js.map": "/Opportunities_Listings_LU/static/js/main.4f3268ab.js.map"
   },
   "entrypoints": [
     "static/css/main.6b34cd0a.css",
-    "static/js/main.83b7f84a.js"
+    "static/js/main.4f3268ab.js"
   ]
 }
