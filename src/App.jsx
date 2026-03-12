@@ -321,6 +321,8 @@ import { HashRouter as Router,Route,Routes } from 'react-router-dom';
 import './App.css';
 import Footer from './components/Footer';
 import HomePage from './components/HomePage';
+import RIASECTest from './components/RiasecTest';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
   return (
@@ -331,8 +333,10 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/listings" element={<ListingPage />} />
           <Route path="/summer_programs" element={<SummerProgramsListing />} />
+          <Route path="/riasec_test" element={<RIASECTest />} />
         </Routes>
         <Footer/>
+        <ToastContainer position="top-center" theme="dark" />
       </div>
     </Router>
   )

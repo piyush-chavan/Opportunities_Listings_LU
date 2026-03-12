@@ -349,6 +349,7 @@ function SummerProgramsListing() {
   const uniqueDurations = Array.from(new Set(opportunities.map(o => ((o['Duration/Timeline']||o['Duration / Timeline']||'')).trim()).filter(Boolean))).sort();
   const uniqueProgramValues = Array.from(new Set(opportunities.map(o => (o['Program Value']||'').trim()).filter(Boolean))).sort();
   const uniqueDataYears = Array.from(new Set(opportunities.map(o => (o['Data Year']||'').trim()).filter(Boolean))).sort();
+  const uniqueCosts = Array.from(new Set(opportunities.map(o => ((o['Cost']||o['Cost Details']||'')).trim()).filter(Boolean))).sort();
 
   return (
     <div className="app">
@@ -434,6 +435,11 @@ function SummerProgramsListing() {
             <select value={uiFilters.dataYear} onChange={(e)=> setUiFilters({...uiFilters, dataYear: e.target.value})}>
               <option value="">Data Years</option>
               {uniqueDataYears.map(v => <option key={v} value={v}>{v}</option>)}
+            </select>
+
+            <select value={uiFilters.cost} onChange={(e) => setUiFilters({ ...uiFilters, cost: e.target.value })}>
+              <option value="">All Costs</option>
+              {uniqueCosts.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
 
             <select value={uiFilters.selectivity} onChange={(e) => setUiFilters({ ...uiFilters, selectivity: e.target.value })}>

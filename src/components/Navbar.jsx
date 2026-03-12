@@ -14,6 +14,7 @@ const Navbar = () => {
                 <div className="navbar-links">
                     <Link to="/"><i class="fa-solid fa-house"></i> Home</Link>
                     <Link to="/listings"> <i class="fa-solid fa-graduation-cap"></i> Programs</Link>
+                    <Link to="/riasec_test"><i class="fa-solid fa-chart-simple"></i> RIASEC Test</Link>
                     <Link to="#about">About</Link>
                     <Link to="#contact">Contact</Link>
                 </div>

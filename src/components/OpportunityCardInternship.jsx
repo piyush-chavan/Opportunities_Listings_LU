@@ -43,6 +43,7 @@ const OpportunityCardInternship = ({ opportunity, index }) => {
                 )}
 
                 {opportunity['Eligibility Details from SOURCE'] && <p className="card-text"><b>Eligibility:</b> {opportunity['Eligibility Details from SOURCE']}</p>}
+                {opportunity['Cost'] && <p className="card-text"><b>Cost:</b> {opportunity['Cost']}</p>}
                 {opportunity['Cost Details'] && <p className="card-text"><b>Cost Details:</b> {opportunity['Cost Details']}</p>}
 
                 {opportunity['Subject'] && <p className="card-text"><b>Subject:</b> {opportunity['Subject']}</p>}
