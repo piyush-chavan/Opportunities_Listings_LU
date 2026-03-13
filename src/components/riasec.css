@@ -314,3 +314,56 @@
 .Toastify__close-button:hover {
   opacity: 1;
 }
+
+/* Dark Mode Styles */
+[data-theme="dark"] .test-container {
+  background: rgba(30, 41, 59, 0.95);
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .question-card {
+  background: rgba(51, 65, 85, 0.95);
+  border-color: #475569;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .question-card p {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .options label {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .options label:hover {
+  background: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
+}
+
+[data-theme="dark"] .result-container {
+  background: rgba(30, 41, 59, 0.9);
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .score-card {
+  background: rgba(51, 65, 85, 0.95);
+  border-color: #475569;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .score-card h1 {
+  color: #a5b4fc;
+}
+
+[data-theme="dark"] .score-card p {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .restart-btn {
+  background: #334155;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .restart-btn:hover {
+  background: #475569;
+}

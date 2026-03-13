@@ -3,20 +3,34 @@
   align-items: center;
   gap: 10px;
   padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.1);
   border-radius: 12px;
   backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .theme-toggle-container {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .theme-label {
   font-size: 13px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(0, 0, 0, 0.7);
   transition: opacity 0.3s ease;
+}
+
+[data-theme="dark"] .theme-label {
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .theme-toggle-container .theme-label.active {
   opacity: 1;
+  color: rgba(0, 0, 0, 0.9);
+}
+
+[data-theme="dark"] .theme-toggle-container .theme-label.active {
   color: white;
 }
 
@@ -44,9 +58,14 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(255, 255, 255, 0.4);
+  background-color: rgba(0, 0, 0, 0.2);
   transition: 0.3s;
   border-radius: 24px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .slider {
+  background-color: rgba(255, 255, 255, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
@@ -64,6 +83,11 @@
 }
 
 .theme-switch input:checked + .slider {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .theme-switch input:checked + .slider {
   background: rgba(255, 255, 255, 0.95);
   border-color: rgba(255, 255, 255, 0.5);
 }
@@ -74,5 +98,9 @@
 }
 
 .theme-switch:hover .slider {
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .theme-switch:hover .slider {
   box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
 }

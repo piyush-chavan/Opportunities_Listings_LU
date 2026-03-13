@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import OpportunityCardInternship from './OpportunityCardInternship';
 import Pagination from './Pagination';
-import ThemeToggle from './ThemeToggle';
 import SearchBar from './SearchBar';
 import { loadExcelSheetFromAssets } from '../utils/excelParser';
 import '../App.css';
@@ -161,14 +160,6 @@ function SummerProgramsListing() {
   const [uiFilters, setUiFilters] = useState(() => ({
     luRating: '', luRemarks: '', programValue: '', notes: '', programName: '', host: '', country: '', subjectStream: '', subjectDetails: '', subject: '', dataYear: '', eligibility: '', geographicAccess: '', residency: '', citizenship: '', enrollmentRule: '', age: '', grade: '', format: '', formatDetails: '', duration: '', applicationBefore: '', allDeadlines: '', officialLink: '', cost: '', costDetails: '', selectivity: '', source: '', tagging: ''
   }));
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    try {
-      const saved = localStorage.getItem('darkMode');
-      return saved ? JSON.parse(saved) : false;
-    } catch (e) {
-      return false;
-    }
-  });
 
   useEffect(() => {
     const params = {};
@@ -223,12 +214,6 @@ function SummerProgramsListing() {
       tagging: searchParams.get('tagging') || ''
     });
   }, [searchParams]);
-
-  useEffect(() => {
-    if (isDarkMode) document.documentElement.setAttribute('data-theme', 'dark');
-    else document.documentElement.removeAttribute('data-theme');
-    try { localStorage.setItem('darkMode', JSON.stringify(isDarkMode)); } catch (e) {}
-  }, [isDarkMode]);
 
   useEffect(() => { loadInitialData(); }, []);
 
@@ -359,7 +344,6 @@ function SummerProgramsListing() {
             <div>
               <p className="app-subtitle">Summer Programs</p>
             </div>
-            <ThemeToggle isDarkMode={isDarkMode} onToggle={() => setIsDarkMode(!isDarkMode)} />
           </div>
         </div>
       </header>
