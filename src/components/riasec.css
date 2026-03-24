@@ -245,6 +245,30 @@
   box-shadow: 0px 8px 20px rgba(99,102,241,0.35);
 }
 
+.buttonContainer {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.download-btn {
+  padding: 12px 30px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #6366f1, #9333ea);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.download-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0px 8px 20px rgba(99,102,241,0.35);
+}
+
 .score-card{
   background:white;
   padding:10px;

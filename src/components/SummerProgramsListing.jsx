@@ -7,7 +7,7 @@ import '../App.css';
 import { useSearchParams } from 'react-router-dom';
 
 const ITEMS_PER_PAGE = 12;
-const EXCEL_FILE_NAME = 'LU Mastersheet.xlsx';
+const EXCEL_FILE_NAME = 'LU Mastersheet (1).xlsx';
 const SHEET_NAME = 'Summer Programs';
 
 // Helper: parse age strings into array of integers (individual ages)

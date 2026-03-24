@@ -5,11 +5,14 @@
   "homepage": "https://piyush-chavan.github.io/Opportunities_Listings_LU",
   "dependencies": {
     "gh-pages": "^6.1.1",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^7.13.1",
     "react-scripts": "5.0.1",
     "react-toastify": "^11.0.5",
+    "recharts": "^3.8.0",
     "xlsx": "^0.18.5"
   },
   "scripts": {

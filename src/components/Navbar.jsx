@@ -36,6 +36,9 @@ const Navbar = ({ isDarkMode, onToggle }) => {
                                 <Link to="/personality-test" onClick={() => setDropdownOpen(false)}>
                                     <i className="fa-solid fa-brain"></i> Personality Test
                                 </Link>
+                                <Link to="/learning-style-test" onClick={() => setDropdownOpen(false)}>
+                                    <i className="fa-solid fa-brain"></i> Learning Style Test
+                                </Link>
                             </div>
                         )}
                     </div>

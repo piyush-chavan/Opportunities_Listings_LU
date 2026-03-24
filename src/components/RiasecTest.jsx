@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import "./riasec.css";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const questions = [
     { id: 1, text: "I like to work on cars", type: "R" },
@@ -61,6 +63,72 @@ const descriptions = {
     S: "Social: People who like helping, teaching, and interacting with others.",
     E: "Enterprising: Leaders who enjoy business, persuasion, and entrepreneurship.",
     C: "Conventional: Organized people who enjoy structure, data, and administration."
+};
+
+const generatePDF = async (result) => {
+  const pdf = new jsPDF();
+  
+  // Add title
+  pdf.setFontSize(20);
+  pdf.text('RIASEC Interest Inventory Test Results', 20, 30);
+  
+  // Add interest code
+  pdf.setFontSize(16);
+  pdf.text(`Your Interest Code: ${result.code.join("-")}`, 20, 50);
+  
+  // Add scores
+  pdf.setFontSize(12);
+  pdf.text('Dimension Scores:', 20, 70);
+  let yPos = 80;
+  result.code.forEach(code => {
+    const score = result.scores[code];
+    pdf.text(`${code}: ${score}`, 30, yPos);
+    yPos += 10;
+  });
+  
+  // Add descriptions
+  pdf.text('RIASEC Personality Types:', 20, yPos + 10);
+  yPos += 20;
+  result.code.forEach(code => {
+    const desc = descriptions[code];
+    const descLines = pdf.splitTextToSize(desc, 170);
+    pdf.text(descLines, 20, yPos);
+    yPos += descLines.length * 5 + 10;
+    
+    // Add career examples
+    const careers = getCareerExamples(code);
+    pdf.text('Career Examples:', 20, yPos);
+    yPos += 10;
+    careers.forEach(career => {
+      pdf.text(`• ${career}`, 30, yPos);
+      yPos += 8;
+    });
+    yPos += 10;
+  });
+  
+  // Add instructions info
+  pdf.addPage();
+  pdf.setFontSize(16);
+  pdf.text('About RIASEC Interest Inventory', 20, 30);
+  pdf.setFontSize(12);
+  const aboutText = "The RIASEC model helps you understand your vocational interests based on six personality types: Realistic, Investigative, Artistic, Social, Enterprising, and Conventional.";
+  const aboutLines = pdf.splitTextToSize(aboutText, 170);
+  pdf.text(aboutLines, 20, 50);
+  
+  // Save the PDF
+  pdf.save('RIASEC_Test_Results.pdf');
+};
+
+const getCareerExamples = (code) => {
+  const examples = {
+    R: ["Agriculture", "Engineering", "Construction", "Mechanic / Machinist", "Computers"],
+    I: ["Marine Biology", "Chemistry", "Zoology", "Medicine", "Psychology"],
+    A: ["Fine Arts", "Photography", "Architecture", "Interior Design", "Media & Communication"],
+    S: ["Counseling", "Nursing", "Education", "Public Relations", "Travel & Hospitality"],
+    E: ["Marketing / Sales", "Law", "Banking", "Real Estate", "Political Science"],
+    C: ["Accounting", "Administration", "Banking", "Insurance", "Data Processing"]
+  };
+  return examples[code] || [];
 };
 
 export default function RIASECTest() {
@@ -248,9 +316,16 @@ export default function RIASECTest() {
 
 
                 </div>
-                <button className="restart-btn" onClick={restart}>
-                    Take Test Again
-                </button>
+                
+                <div className="buttonContainer">
+                    <button className="download-btn" onClick={() => generatePDF(result)}>
+                        Download PDF Report
+                    </button>
+                    
+                    <button className="restart-btn" onClick={restart}>
+                        Take Test Again
+                    </button>
+                </div>
 
             </div>
         );
