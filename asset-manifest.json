@@ -1,14 +1,18 @@
 {
   "files": {
-    "main.css": "/Opportunities_Listings_LU/static/css/main.57dfff8e.css",
-    "main.js": "/Opportunities_Listings_LU/static/js/main.d24c11bb.js",
+    "main.css": "/Opportunities_Listings_LU/static/css/main.659a9152.css",
+    "main.js": "/Opportunities_Listings_LU/static/js/main.b1cb7dee.js",
+    "static/js/977.cd5936b2.chunk.js": "/Opportunities_Listings_LU/static/js/977.cd5936b2.chunk.js",
+    "static/js/455.9bf4f26b.chunk.js": "/Opportunities_Listings_LU/static/js/455.9bf4f26b.chunk.js",
     "static/media/LU_logo.png": "/Opportunities_Listings_LU/static/media/LU_logo.2c50b4e0721b1ef6bdbf.png",
     "index.html": "/Opportunities_Listings_LU/index.html",
-    "main.57dfff8e.css.map": "/Opportunities_Listings_LU/static/css/main.57dfff8e.css.map",
-    "main.d24c11bb.js.map": "/Opportunities_Listings_LU/static/js/main.d24c11bb.js.map"
+    "main.659a9152.css.map": "/Opportunities_Listings_LU/static/css/main.659a9152.css.map",
+    "main.b1cb7dee.js.map": "/Opportunities_Listings_LU/static/js/main.b1cb7dee.js.map",
+    "977.cd5936b2.chunk.js.map": "/Opportunities_Listings_LU/static/js/977.cd5936b2.chunk.js.map",
+    "455.9bf4f26b.chunk.js.map": "/Opportunities_Listings_LU/static/js/455.9bf4f26b.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.57dfff8e.css",
-    "static/js/main.d24c11bb.js"
+    "static/css/main.659a9152.css",
+    "static/js/main.b1cb7dee.js"
   ]
 }
