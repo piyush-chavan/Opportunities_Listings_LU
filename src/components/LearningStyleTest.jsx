@@ -172,7 +172,7 @@ export default function LearningStyleTest() {
                             {q.map((word, i) => (
                                 <div key={i} className="option">
                                     <span>{word}</span>
-                                    <select
+                                    {/* <select
                                         value={answers[qi][i]}
                                         onChange={(e) =>
                                             handleChange(qi, i, e.target.value)
@@ -182,6 +182,30 @@ export default function LearningStyleTest() {
                                         {[1, 2, 3, 4].map((n) => (
                                             <option key={n}>{n}</option>
                                         ))}
+                                    </select> */}
+                                    <select
+                                        value={answers[qi][i]}
+                                        onChange={(e) =>
+                                            handleChange(qi, i, e.target.value)
+                                        }
+                                    >
+                                        <option value="">clear</option>
+
+                                        {[1, 2, 3, 4].map((n) => {
+                                            const isUsedElsewhere =
+                                                answers[qi].includes(String(n)) &&
+                                                answers[qi][i] !== String(n);
+
+                                            return (
+                                                <option
+                                                    key={n}
+                                                    value={n}
+                                                    disabled={isUsedElsewhere}
+                                                >
+                                                    {n}
+                                                </option>
+                                            );
+                                        })}
                                     </select>
                                 </div>
                             ))}
@@ -247,7 +271,7 @@ export default function LearningStyleTest() {
                     <div className="style-card highlight">
 
                         <div className="style-header">
-                            <h4 style={{ fontSize: '1.2rem' }}>Dominant Quadrant: {result.quadrant}</h4>
+                            <h4 style={{ fontSize: '1.2rem' }}>Dominant Learning Orientation: {result.quadrant}</h4>
                         </div>
 
                         <p className="desc" style={{ fontSize: '1rem', textAlign: 'justify' }}>

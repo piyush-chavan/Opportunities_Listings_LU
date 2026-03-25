@@ -137,3 +137,59 @@ button {
   color: #475569;
   line-height: 1.6;
 }
+/* Select container alignment */
+.option select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  padding: 8px 36px 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+
+  background-color: #f8fafc;
+  color: #1e293b;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+  outline: none;
+
+  transition: all 0.2s ease;
+}
+
+/* Hover */
+.option select:hover {
+  border-color: #6366f1;
+  background-color: #eef2ff;
+}
+
+/* Focus */
+.option select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  background-color: #ffffff;
+}
+
+/* Disabled options */
+.option select option:disabled {
+  color: #cbd5f5;
+}
+
+/* Wrapper for arrow */
+.option {
+  position: relative;
+}
+
+/* Custom dropdown arrow */
+.option::after {
+  content: "▾";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #64748b;
+  font-size: 12px;
+}
