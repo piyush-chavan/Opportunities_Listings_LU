@@ -9,9 +9,11 @@ import HomePage from './components/HomePage';
 import RIASECTest from './components/RiasecTest';
 import PersonalityTest from './components/PersonalityTest';
 import Instructions from './components/Instructions';
+import AptitudeTestEntry from './components/AptitudeTestEntry';
 import { ToastContainer } from 'react-toastify';
 import { useState, useEffect } from 'react';
 import LearningStyleTest from './components/LearningStyleTest';
+import Report from './components/Report';
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -49,6 +51,8 @@ function App() {
           <Route path="/riasec" element={<RIASECTest />} />
           <Route path="/personality-test" element={<PersonalityTest />} />
           <Route path="/learning-style-test" element={<LearningStyleTest/>} />
+          <Route path="/aptitude-test" element={<AptitudeTestEntry />} />
+          <Route path="/report" element={<Report/>} />
         </Routes>
         <Footer/>
         <ToastContainer position="top-center" theme="dark" />

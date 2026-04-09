@@ -39,6 +39,12 @@ const Navbar = ({ isDarkMode, onToggle }) => {
                                 <Link to="/learning-style-test" onClick={() => setDropdownOpen(false)}>
                                     <i className="fa-solid fa-brain"></i> Learning Style Test
                                 </Link>
+                                <Link to="/aptitude-test" onClick={() => setDropdownOpen(false)}>
+                                    <i className="fa-solid fa-calculator"></i> Aptitude Test
+                                </Link>
+                                <Link to="/report" onClick={() => setDropdownOpen(false)}>
+                                    <i class="fa-solid fa-file"></i> Report
+                                </Link>
                             </div>
                         )}
                     </div>

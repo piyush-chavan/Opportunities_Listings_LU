@@ -1,0 +1,53 @@
+body {
+  font-family: Arial;
+  background: #0f172a;
+  color: white;
+  margin: 0;
+}
+
+/* Grade */
+.grade-container {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 100px;
+}
+
+.grade-container button {
+  padding: 15px 25px;
+  border: none;
+  background: #7c3aed;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* Test */
+.test-container {
+  padding: 20px;
+}
+
+.section {
+  color: black;
+  margin-bottom: 40px;
+}
+
+
+.question-card label {
+  display: block;
+  margin: 5px 0;
+}
+
+.submit-btn {
+  padding: 15px;
+  background: #22c55e;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* Result */
+.result-container {
+  text-align: center;
+  margin-top: 50px;
+}

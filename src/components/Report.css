@@ -1,0 +1,68 @@
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: #0f172a;
+  color: #fff;
+}
+
+/* Container */
+.report-container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 30px;
+}
+
+/* Title */
+.title {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #a78bfa;
+}
+
+/* Card */
+.card {
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  text-align: left;
+}
+
+
+
+h3 {
+  margin-top: 15px;
+}
+
+/* Lists */
+ul {
+  padding-left: 20px;
+  text-align: left;
+}
+
+li {
+  margin: 5px 0;
+}
+
+/* Table */
+.career-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.career-table th,
+.career-table td {
+  border: 1px solid #334155;
+  padding: 10px;
+  text-align: left;
+}
+
+.career-table th {
+  background: #7c3aed;
+}
+
+.career-table tr:nth-child(even) {
+  background: #0f172a;
+}
