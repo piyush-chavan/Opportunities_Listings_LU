@@ -1,0 +1,59 @@
+/* TestPipelineSidebar Styles */
+
+.sidebar-expand-btn {
+  position: fixed;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 0 8px 8px 0;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: none;
+  z-index: 100;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-expand-btn:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 768px) {
+  .sidebar-expand-btn {
+    display: block;
+  }
+
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    z-index: 99;
+    border-right: 1px solid #ddd;
+  }
+
+  .sidebar.closed {
+    transform: translateX(-100%);
+  }
+}
+
+/* Mobile Test Progress */
+@media (max-width: 768px) {
+  .progress-counter {
+    font-size: 0.8rem;
+    padding: 3px 8px;
+  }
+
+  .test-item-content {
+    gap: 8px;
+  }
+
+  .test-name {
+    font-size: 0.85rem;
+  }
+}

@@ -14,6 +14,7 @@ import { ToastContainer } from 'react-toastify';
 import { useState, useEffect } from 'react';
 import LearningStyleTest from './components/LearningStyleTest';
 import Report from './components/Report';
+import TestPipeline from './components/TestPipeline';
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -48,6 +49,7 @@ function App() {
           <Route path="/listings" element={<ListingPage />} />
           <Route path="/summer_programs" element={<SummerProgramsListing />} />
           <Route path="/instructions" element={<Instructions />} />
+          <Route path="/test-pipeline" element={<TestPipeline />} />
           <Route path="/riasec" element={<RIASECTest />} />
           <Route path="/personality-test" element={<PersonalityTest />} />
           <Route path="/learning-style-test" element={<LearningStyleTest/>} />
