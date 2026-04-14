@@ -6,6 +6,7 @@ import RiasecTestPipeline from "./RiasecTestPipeline";
 import PersonalityTestPipeline from "./PersonalityTestPipeline";
 import LearningStyleTestPipeline from "./LearningStyleTestPipeline";
 import AptitudeTestPipeline from "./AptitudeTestPipeline";
+import StudentInfoInput from "./StudentInfoInput";
 
 const TestPipeline = () => {
   const [currentTestIndex, setCurrentTestIndex] = useState(0);
@@ -15,6 +16,7 @@ const TestPipeline = () => {
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   const tests = [
+    {name:"Student Information",id:'student_info',component:StudentInfoInput},
     { name: "RIASEC Career Test", id: "riasec", component: RiasecTestPipeline },
     { name: "Personality Test (MBTI)", id: "personality", component: PersonalityTestPipeline },
     { name: "Learning Style Test", id: "learning", component: LearningStyleTestPipeline },

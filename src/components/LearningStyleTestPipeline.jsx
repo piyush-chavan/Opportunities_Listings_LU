@@ -193,7 +193,7 @@ export default function LearningStyleTestPipeline({ onComplete, testNumber, tota
 
             <div className="container">
                 {/* Instructions */}
-                <div className="card">
+                <div style={{color:'white'}} className="card">
                     <h3>Instructions</h3>
                     <ul style={{ marginLeft: '20px' }}>
                         <li>Each question has 4 words.</li>
@@ -205,7 +205,7 @@ export default function LearningStyleTestPipeline({ onComplete, testNumber, tota
                 </div>
 
                 {questions.map((q, qi) => (
-                    <div key={qi} className="card">
+                    <div key={qi} className="card" style={{color:'white'}}>
                         <p><strong>Q{qi + 1}</strong></p>
 
                         {q.map((word, i) => (

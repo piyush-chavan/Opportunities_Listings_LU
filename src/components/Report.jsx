@@ -2,7 +2,7 @@ import "./Report.css";
 
 const Report = () => {
     return (
-        <div className="report-container">
+        <div style={{color:'white'}} className="report-container">
 
             <h1 className="title">Aptitude & Career Report</h1>
 

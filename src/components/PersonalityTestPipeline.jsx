@@ -231,7 +231,7 @@ export default function PersonalityTestPipeline({ onComplete, testNumber, totalT
                 Auto-fill (Testing)
               </button>
 
-        <div className="card" style={{backgroundColor:'#000000cf'}}>
+        <div className="card" style={{color:'white',backgroundColor:'#000000cf'}}>
           <h3>Question {q.id}</h3>
           <h3>I Prefer : </h3>
 

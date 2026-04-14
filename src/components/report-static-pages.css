@@ -1,0 +1,87 @@
+.report-page {
+  width: 800px;
+  margin: auto;
+  font-family: 'Poppins', sans-serif;
+  text-align: left;
+}
+.cover-page{
+    color: black;
+}
+.report-appendix-page{
+    color: black;
+}
+
+.page {
+  min-height: 1000px;
+  padding: 40px;
+  page-break-after: always;
+}
+
+.gradient-bg {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: white;
+}
+
+.light-bg {
+  background: #f9fafb;
+}
+
+.center {
+  text-align: center;
+}
+
+
+
+.subtitle {
+  margin-top: 10px;
+  opacity: 0.9;
+}
+
+.name {
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.timeline div {
+  margin: 10px 0;
+}
+
+.list li {
+  margin: 10px 0;
+  font-size: 16px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.card-121 {
+  padding: 20px;
+  border-radius: 12px;
+  color: black;
+}
+
+.red { background: #ef4444; }
+.green { background: #10b981; }
+.orange { background: #f59e0b; }
+.yellow { background: #eab308; }
+
+.note {
+  margin-top: 30px;
+  font-size: 14px;
+}
+
+.btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+}
+
+.appendix-section {
+  margin-bottom: 20px;
+}
