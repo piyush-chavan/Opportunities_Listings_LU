@@ -20,7 +20,7 @@ const Navbar = ({ isDarkMode, onToggle }) => {
                 </div>
                 <div className="navbar-links">
                     <Link to="/"><i className="fa-solid fa-house"></i> Home</Link>
-                    <Link to="/listings"> <i className="fa-solid fa-graduation-cap"></i> Programs</Link>
+                    <Link to="/summer_programs"> <i className="fa-solid fa-graduation-cap"></i> Programs</Link>
                     <div className="dropdown">
                         <button className="dropdown-btn" onClick={toggleDropdown}>
                             <i className="fa-solid fa-info-circle"></i> Assessments <i className="fa-solid fa-chevron-down"></i>

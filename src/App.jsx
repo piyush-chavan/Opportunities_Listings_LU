@@ -1,20 +1,20 @@
-import React from 'react';
+import {lazy,Suspense} from 'react';
 import './App.css';
 import { HashRouter as Router,Route,Routes } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import ListingPage from './components/ListingPage';
-import SummerProgramsListing from './components/SummerProgramsListing';
-import Footer from './components/Footer';
-import HomePage from './components/HomePage';
-import RIASECTest from './components/RiasecTest';
-import PersonalityTest from './components/PersonalityTest';
-import Instructions from './components/Instructions';
-import AptitudeTestEntry from './components/AptitudeTestEntry';
+const Navbar = lazy(() => import('./components/Navbar'));
+const ListingPage = lazy(() => import('./components/ListingPage'));
+const SummerProgramsListing = lazy(() => import('./components/SummerProgramsListing'));
+const Footer = lazy(() => import('./components/Footer'));
+const HomePage = lazy(() => import('./components/HomePage'));
+const RIASECTest = lazy(() => import('./components/RiasecTest'));
+const PersonalityTest = lazy(() => import('./components/PersonalityTest'));
+const Instructions = lazy(() => import('./components/Instructions'));
+const AptitudeTestEntry = lazy(() => import('./components/AptitudeTestEntry'));
+const LearningStyleTest = lazy(() => import('./components/LearningStyleTest'));
+const Report = lazy(() => import('./components/Report'));
+const TestPipeline = lazy(() => import('./components/TestPipeline'));
 import { ToastContainer } from 'react-toastify';
 import { useState, useEffect } from 'react';
-import LearningStyleTest from './components/LearningStyleTest';
-import Report from './components/Report';
-import TestPipeline from './components/TestPipeline';
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -44,6 +44,7 @@ function App() {
     <Router>
       <div>
         <Navbar isDarkMode={isDarkMode} onToggle={() => setIsDarkMode(!isDarkMode)} />
+          <Suspense fallback={<div className="loading-container"><div className="spinner"></div><p>Loading...</p></div>}>
         <Routes>
           <Route path="/" element={<HomePage isDarkMode={isDarkMode} />} />
           <Route path="/listings" element={<ListingPage />} />
@@ -58,6 +59,7 @@ function App() {
         </Routes>
         <Footer/>
         <ToastContainer position="top-center" theme="dark" />
+        </Suspense>
       </div>
     </Router>
   )

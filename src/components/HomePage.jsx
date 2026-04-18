@@ -77,7 +77,7 @@ const HomePage = ({ isDarkMode }) => {
                 backgroundColor: isDarkMode ? "#333333" : "#ffffff",
                 color: isDarkMode ? "#ffffff" : "#000000",
               }}
-              onClick={() => navigate("/listings")}
+              onClick={() => navigate("/summer_programs")}
             />
             <button
               style={{
@@ -90,7 +90,7 @@ const HomePage = ({ isDarkMode }) => {
                 color: "white",
                 cursor: "pointer",
               }}
-              onClick={() => navigate("/listings")}
+              onClick={() => navigate("/summer_programs")}
             >
               Search
             </button>
@@ -133,7 +133,7 @@ const HomePage = ({ isDarkMode }) => {
               cursor: "pointer",
               transition: "background-color 0.2s",
             }}
-            onClick={() => navigate("/listings")}
+            onClick={() => navigate("/summer_programs")}
             onMouseOver={(e) => (e.target.style.backgroundColor = isDarkMode ? "#555555" : "#218838")}
             onMouseOut={(e) => (e.target.style.backgroundColor = isDarkMode ? "#333333" : "#28a745")}
           >

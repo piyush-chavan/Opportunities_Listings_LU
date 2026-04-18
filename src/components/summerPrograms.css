@@ -1,0 +1,48 @@
+.summer-programs-sidebar{
+    flex: 1;
+    width: 400px;
+    height: 80vh;
+    position: sticky;
+    top:120px;
+    padding: 30px;
+    padding-top: 0;
+    box-shadow: 0 0 20px purple;
+    overflow-y: scroll;
+
+}
+.summer-programs-content-container{
+    flex: 3;
+    padding: 20px;
+
+}
+.summer-programs-body-container{
+    display: flex;
+}
+.kv-container {
+  /* max-width: 500px; */
+  margin: 10px 0;
+  font-family: system-ui, sans-serif;
+}
+
+.kv-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.kv-table th {
+  text-align: left;
+  font-weight: 600;
+  padding: 8px 10px;
+  width: 20%;
+  color: #ffeb3b;
+}
+
+.kv-table td {
+  padding: 8px 10px;
+  color: #ffffff;
+}
+
+/* subtle row separation */
+.kv-table tr:not(:last-child) {
+  border-bottom: 1px solid #eee;
+}
