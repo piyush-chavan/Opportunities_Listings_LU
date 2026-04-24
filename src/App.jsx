@@ -1,9 +1,15 @@
 import {lazy,Suspense} from 'react';
 import './App.css';
 import { HashRouter as Router,Route,Routes } from 'react-router-dom';
+import ProtectedRoute from './components/ProtectedRoute';
 const Navbar = lazy(() => import('./components/Navbar'));
+const SignInPage = lazy(() => import('./components/SignInPage'));
 const ListingPage = lazy(() => import('./components/ListingPage'));
 const SummerProgramsListing = lazy(() => import('./components/SummerProgramsListing'));
+const CompetitionsListing = lazy(() => import('./components/CompetitionsListing'));
+const InternshipsListing = lazy(() => import('./components/InternshipsListing'));
+const CoursesListing = lazy(() => import('./components/CoursesListing'));
+const ScholarshipsListing = lazy(() => import('./components/ScholarshipsListing'));
 const Footer = lazy(() => import('./components/Footer'));
 const HomePage = lazy(() => import('./components/HomePage'));
 const RIASECTest = lazy(() => import('./components/RiasecTest'));
@@ -17,48 +23,44 @@ import { ToastContainer } from 'react-toastify';
 import { useState, useEffect } from 'react';
 
 function App() {
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    try {
-      const saved = localStorage.getItem('darkMode');
-      return saved ? JSON.parse(saved) : false;
-    } catch (e) {
-      return false;
-    }
-  });
-
-  // Apply dark mode theme
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-    }
-    try {
-      localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
-    } catch (e) {
-      console.warn('Could not save dark mode preference:', e);
-    }
-  }, [isDarkMode]);
+  
 
   return (
     <Router>
       <div>
-        <Navbar isDarkMode={isDarkMode} onToggle={() => setIsDarkMode(!isDarkMode)} />
-          <Suspense fallback={<div className="loading-container"><div className="spinner"></div><p>Loading...</p></div>}>
-        <Routes>
-          <Route path="/" element={<HomePage isDarkMode={isDarkMode} />} />
-          <Route path="/listings" element={<ListingPage />} />
-          <Route path="/summer_programs" element={<SummerProgramsListing />} />
-          <Route path="/instructions" element={<Instructions />} />
-          <Route path="/test-pipeline" element={<TestPipeline />} />
-          <Route path="/riasec" element={<RIASECTest />} />
-          <Route path="/personality-test" element={<PersonalityTest />} />
-          <Route path="/learning-style-test" element={<LearningStyleTest/>} />
-          <Route path="/aptitude-test" element={<AptitudeTestEntry />} />
-          <Route path="/report" element={<Report/>} />
-        </Routes>
-        <Footer/>
-        <ToastContainer position="top-center" theme="dark" />
+        <Suspense fallback={<div className="loading-container"><div className="spinner"></div><p>Loading...</p></div>}>
+          <Routes>
+            {/* Public Route - Sign In */}
+            <Route path="/sign-in" element={<SignInPage />} />
+
+            {/* Protected Routes - All wrapped once */}
+            <Route 
+              path="/*" 
+              element={
+                <ProtectedRoute>
+                  <Navbar />
+                  <Routes>
+                    <Route path="/" element={<HomePage/>} />
+                    <Route path="/listings" element={<ListingPage />} />
+                    <Route path="/summer_programs" element={<SummerProgramsListing />} />
+                    <Route path="/competitions" element={<CompetitionsListing />} />
+                    <Route path="/internships" element={<InternshipsListing />} />
+                    <Route path="/courses" element={<CoursesListing />} />
+                    <Route path="/scholarships" element={<ScholarshipsListing />} />
+                    <Route path="/instructions" element={<Instructions />} />
+                    <Route path="/test-pipeline" element={<TestPipeline />} />
+                    <Route path="/riasec" element={<RIASECTest />} />
+                    <Route path="/personality-test" element={<PersonalityTest />} />
+                    <Route path="/learning-style-test" element={<LearningStyleTest/>} />
+                    <Route path="/aptitude-test" element={<AptitudeTestEntry />} />
+                    <Route path="/report" element={<Report/>} />
+                  </Routes>
+                  <Footer/>
+                </ProtectedRoute>
+              } 
+            />
+          </Routes>
+          <ToastContainer position="top-center" theme="dark" />
         </Suspense>
       </div>
     </Router>

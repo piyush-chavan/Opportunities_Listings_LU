@@ -9,8 +9,8 @@ import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const ITEMS_PER_PAGE = 12;
-const EXCEL_FILE_NAME = 'LU Mastersheet (1).xlsx';
-const SHEET_NAME = 'Summer Programs';
+const EXCEL_FILE_NAME = 'LU Mastersheet.xlsx';
+const SHEET_NAME = 'Summer Programs Database';
 
 // Helper: parse age strings into array of integers (individual ages)
 const parseAgeString = (s) => {
@@ -279,8 +279,8 @@ function SummerProgramsListing() {
         } catch (e) { copy._gradeList = []; }
         // Normalize deadlines
         const rawDl = copy['Application Deadline'] || copy['All Deadlines'] || '';
-        copy['Application Deadline'] = normalizeDeadline(rawDl);
-        copy['All Deadlines'] = normalizeDeadline(copy['All Deadlines'] || '');
+        // copy['Application Deadline'] = normalizeDeadline(rawDl);
+        // copy['All Deadlines'] = normalizeDeadline(copy['All Deadlines'] || '');
         return copy;
       });
 
@@ -357,7 +357,7 @@ function SummerProgramsListing() {
 
           </div>
 
-          <div style={{ position: 'sticky', top: 0, borderRadius: '20px', backgroundColor: '#413f3f7d', backdropFilter: 'blur(10px)', padding: '20px 10px' }}>
+          <div style={{ position: 'sticky', top: 0, borderRadius: '20px', backgroundColor: '#ffffff7d', backdropFilter: 'blur(10px)', padding: '20px 10px' }}>
 
             {opportunities.length > 0 && (<SearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />)}
             <div style={{ display: 'flex', gap: 8 }}>
@@ -402,43 +402,45 @@ function SummerProgramsListing() {
               <option value="">All Ages</option>
               {uniqueAges.map(a => <option key={a} value={a}>{a}</option>)}
             </select>
-            <select value={uiFilters.host} onChange={(e) => setUiFilters({ ...uiFilters, host: e.target.value })}>
-              <option value="">All Hosts</option>
-              {uniqueHosts.map(h => <option key={h} value={h}>{h}</option>)}
-            </select>
+            <details>
+              <summary>More Filters</summary>
+              <select value={uiFilters.host} onChange={(e) => setUiFilters({ ...uiFilters, host: e.target.value })}>
+                <option value="">All Hosts</option>
+                {uniqueHosts.map(h => <option key={h} value={h}>{h}</option>)}
+              </select>
 
 
 
 
 
 
-            <select value={uiFilters.residency} onChange={(e) => setUiFilters({ ...uiFilters, residency: e.target.value })}>
-              <option value="">All Residency</option>
-              {uniqueResidency.map(v => <option key={v} value={v}>{v}</option>)}
-            </select>
+              <select value={uiFilters.residency} onChange={(e) => setUiFilters({ ...uiFilters, residency: e.target.value })}>
+                <option value="">All Residency</option>
+                {uniqueResidency.map(v => <option key={v} value={v}>{v}</option>)}
+              </select>
 
-            <select value={uiFilters.citizenship} onChange={(e) => setUiFilters({ ...uiFilters, citizenship: e.target.value })}>
-              <option value="">All Citizenship</option>
-              {uniqueCitizenship.map(v => <option key={v} value={v}>{v}</option>)}
-            </select>
+              <select value={uiFilters.citizenship} onChange={(e) => setUiFilters({ ...uiFilters, citizenship: e.target.value })}>
+                <option value="">All Citizenship</option>
+                {uniqueCitizenship.map(v => <option key={v} value={v}>{v}</option>)}
+              </select>
 
-            {/* <select value={uiFilters.duration} onChange={(e)=> setUiFilters({...uiFilters, duration: e.target.value})}>
+              {/* <select value={uiFilters.duration} onChange={(e)=> setUiFilters({...uiFilters, duration: e.target.value})}>
               <option value="">All Durations</option>
               {uniqueDurations.map(v => <option key={v} value={v}>{v}</option>)}
             </select> */}
 
 
 
-            <select value={uiFilters.dataYear} onChange={(e) => setUiFilters({ ...uiFilters, dataYear: e.target.value })}>
-              <option value="">Data Years</option>
-              {uniqueDataYears.map(v => <option key={v} value={v}>{v}</option>)}
-            </select>
+              <select value={uiFilters.dataYear} onChange={(e) => setUiFilters({ ...uiFilters, dataYear: e.target.value })}>
+                <option value="">Data Years</option>
+                {uniqueDataYears.map(v => <option key={v} value={v}>{v}</option>)}
+              </select>
 
-            <select value={uiFilters.cost} onChange={(e) => setUiFilters({ ...uiFilters, cost: e.target.value })}>
-              <option value="">All Costs</option>
-              {uniqueCosts.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-
+              <select value={uiFilters.cost} onChange={(e) => setUiFilters({ ...uiFilters, cost: e.target.value })}>
+                <option value="">All Costs</option>
+                {uniqueCosts.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </details>
 
 
 

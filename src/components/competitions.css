@@ -1,0 +1,52 @@
+.competitions-sidebar{
+    /* flex: 1; */
+    width: 360px;
+    height: 80vh;
+    position: sticky;
+    top:120px;
+    padding: 30px;
+    padding-top: 0;
+    box-shadow: 0 0 20px purple;
+    overflow-y: scroll;
+
+
+}
+select{
+  max-width: 300px;
+}
+.competitions-content-container{
+    flex: 3;
+    padding: 20px;
+
+}
+.competitions-body-container{
+    display: flex;
+}
+.kv-container {
+  /* max-width: 500px; */
+  margin: 10px 0;
+  font-family: system-ui, sans-serif;
+}
+
+.kv-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.kv-table th {
+  text-align: left;
+  font-weight: 600;
+  padding: 8px 10px;
+  width: 20%;
+  color: #833bff;
+}
+
+.kv-table td {
+  padding: 8px 10px;
+  color: #000000;
+}
+
+/* subtle row separation */
+.kv-table tr:not(:last-child) {
+  border-bottom: 1px solid #eee;
+}

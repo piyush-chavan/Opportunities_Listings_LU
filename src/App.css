@@ -18,16 +18,7 @@
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
-[data-theme="dark"] {
-  --text-primary: #f9fafb;
-  --text-secondary: #d1d5db;
-  --border-color: #374151;
-  --bg-light: #111827;
-  --bg-card: #1f2937;
-  --bg-hover: #374151;
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
-}
+
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -160,29 +151,11 @@ body {
   cursor: not-allowed;
 }
 
-[data-theme="dark"] .upload-button {
-  background: #1f2937;
-  border-color: #4b5563;
-  color: #f9fafb;
-}
 
-[data-theme="dark"] .upload-button:hover {
-  background: #374151;
-  border-color: #667eea;
-  color: #a5b4fc;
-}
 
-[data-theme="dark"] .reload-button {
-  background: #1f2937;
-  border-color: #4b5563;
-  color: #f9fafb;
-}
 
-[data-theme="dark"] .reload-button:hover:not(:disabled) {
-  background: #374151;
-  border-color: #667eea;
-  color: #a5b4fc;
-}
+
+
 
 .file-info {
   display: flex;
@@ -243,7 +216,7 @@ body {
 /* Opportunities Grid */
 .opportunities-grid {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 20px;
   margin-bottom: 32px;
 }
@@ -260,11 +233,7 @@ body {
   border: 1px solid var(--border-color);
 }
 
-[data-theme="dark"] .page-info {
-  background: #1f2937;
-  border-color: #374151;
-  color: #9ca3af;
-}
+
 
 /* Empty State */
 .empty-state {
@@ -292,17 +261,7 @@ body {
   font-size: 16px;
 }
 
-[data-theme="dark"] .empty-state h3 {
-  color: #f9fafb;
-}
 
-[data-theme="dark"] .empty-state p {
-  color: #9ca3af;
-}
-
-[data-theme="dark"] .empty-state svg path {
-  stroke: #6b7280;
-}
 
 /* Footer */
 .app-footer {

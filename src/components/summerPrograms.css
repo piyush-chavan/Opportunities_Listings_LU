@@ -1,6 +1,6 @@
 .summer-programs-sidebar{
-    flex: 1;
-    width: 400px;
+    /* flex: 1; */
+    width: 360px;
     height: 80vh;
     position: sticky;
     top:120px;
@@ -32,14 +32,14 @@
 .kv-table th {
   text-align: left;
   font-weight: 600;
-  padding: 8px 10px;
+  padding: 0 10px;
   width: 20%;
-  color: #ffeb3b;
+  color: #763bff;
 }
 
 .kv-table td {
-  padding: 8px 10px;
-  color: #ffffff;
+  padding: 0 10px;
+  color: #000000;
 }
 
 /* subtle row separation */

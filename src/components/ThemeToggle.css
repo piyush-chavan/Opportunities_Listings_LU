@@ -9,11 +9,6 @@
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-[data-theme="dark"] .theme-toggle-container {
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
 .theme-label {
   font-size: 13px;
   font-weight: 600;
@@ -21,17 +16,9 @@
   transition: opacity 0.3s ease;
 }
 
-[data-theme="dark"] .theme-label {
-  color: rgba(255, 255, 255, 0.9);
-}
-
 .theme-toggle-container .theme-label.active {
   opacity: 1;
   color: rgba(0, 0, 0, 0.9);
-}
-
-[data-theme="dark"] .theme-toggle-container .theme-label.active {
-  color: white;
 }
 
 .theme-toggle-container .theme-label:not(.active) {
@@ -64,11 +51,6 @@
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-[data-theme="dark"] .slider {
-  background-color: rgba(255, 255, 255, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
 .slider:before {
   position: absolute;
   content: "";
@@ -87,11 +69,6 @@
   border-color: rgba(0, 0, 0, 0.2);
 }
 
-[data-theme="dark"] .theme-switch input:checked + .slider {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: rgba(255, 255, 255, 0.5);
-}
-
 .theme-switch input:checked + .slider:before {
   transform: translateX(24px);
   background-color: #667eea;
@@ -99,8 +76,4 @@
 
 .theme-switch:hover .slider {
   box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
-}
-
-[data-theme="dark"] .theme-switch:hover .slider {
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
 }

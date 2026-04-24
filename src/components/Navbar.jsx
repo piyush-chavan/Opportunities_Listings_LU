@@ -2,14 +2,22 @@ import React, { useState } from "react";
 import "./styles.css";
 import logo from "../assets/logos/LU_logo.png";
 import { Link, useNavigate } from "react-router-dom";
-import ThemeToggle from "./ThemeToggle";
+import { signOut } from 'firebase/auth';
+import { auth } from '../firebase';
+// import ThemeToggle from "./ThemeToggle";
 
-const Navbar = ({ isDarkMode, onToggle }) => {
+const Navbar = () => {
     const navigate = useNavigate();
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [programsopen, setprogramsopen] = useState(false)
 
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
+    };
+
+    const handleSignOut = async () => {
+        await signOut(auth);
+        navigate('/sign-in');
     };
 
     return (
@@ -20,7 +28,22 @@ const Navbar = ({ isDarkMode, onToggle }) => {
                 </div>
                 <div className="navbar-links">
                     <Link to="/"><i className="fa-solid fa-house"></i> Home</Link>
-                    <Link to="/summer_programs"> <i className="fa-solid fa-graduation-cap"></i> Programs</Link>
+                    <div className="dropdown">
+                        <button className="dropdown-btn" onClick={() => setprogramsopen(!programsopen)}>
+                            <i className="fa-solid fa-graduation-cap"></i> Programs <i className="fa-solid fa-chevron-down"></i>
+                        </button>
+                        {programsopen && (
+                            <div className="dropdown-content">
+                                <Link to="/summer_programs" onClick={() => setprogramsopen(false)}>
+                                    <i className="fa-solid fa-info"></i> Summer programs
+                                </Link>
+                                <Link to="/competitions" onClick={() => setprogramsopen(false)}>
+                                    <i className="fa-solid fa-chart-line"></i> Competitions
+                                </Link>
+
+                            </div>
+                        )}
+                    </div>
                     <div className="dropdown">
                         <button className="dropdown-btn" onClick={toggleDropdown}>
                             <i className="fa-solid fa-info-circle"></i> Assessments <i className="fa-solid fa-chevron-down"></i>
@@ -46,18 +69,17 @@ const Navbar = ({ isDarkMode, onToggle }) => {
                                     <i className="fa-solid fa-calculator"></i> Aptitude Test
                                 </Link>
                                 <Link to="/report" onClick={() => setDropdownOpen(false)}>
-                                    <i class="fa-solid fa-file"></i> Report
+                                    <i className="fa-solid fa-file"></i> Report
                                 </Link>
                             </div>
                         )}
                     </div>
-                    <Link to="#about">About</Link>
-                    <Link to="#contact">Contact</Link>
+                    {/* <Link to="#about">About</Link>
+                    <Link to="#contact">Contact</Link> */}
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <ThemeToggle isDarkMode={isDarkMode} onToggle={onToggle} />
-                    <button className="navbar-btn" onClick={() => navigate('/listings')}><i className="fa-brands fa-wpexplorer"></i> Explore</button>
+                    <button className="sign-out-button" onClick={handleSignOut}>Sign Out</button>
                 </div>
             </div>
         </nav>

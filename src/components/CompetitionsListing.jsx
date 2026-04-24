@@ -1,0 +1,536 @@
+import { useState, useEffect } from 'react';
+import OpportunityCardCompetition from './OpportunityCardCompetition';
+import Pagination from './Pagination';
+import SearchBar from './SearchBar';
+import { loadExcelSheetFromAssets } from '../utils/excelParser';
+import '../App.css';
+import './competitions.css';
+import { useSearchParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+const ITEMS_PER_PAGE = 12;
+const EXCEL_FILE_NAME = 'LU Mastersheet.xlsx';
+const SHEET_NAME = 'Competitions Database';
+
+// Helper: parse age strings into array of integers (individual ages)
+const parseAgeString = (s) => {
+  if (!s) return [];
+  const raw = String(s).trim();
+  const nums = raw.match(/\d+/g) || [];
+  // handle formats like '13-15'
+  if (raw.includes('-') && nums.length >= 2) {
+    const start = Number(nums[0]);
+    const end = Number(nums[1]);
+    if (Number.isFinite(start) && Number.isFinite(end) && end >= start) {
+      const out = [];
+      for (let i = start; i <= end; i++) out.push(i);
+      return out;
+    }
+  }
+  // handle '16+' etc. cap upper limit to 18
+  if (raw.includes('+') && nums.length >= 1) {
+    const start = Number(nums[0]);
+    const upper = 18;
+    if (Number.isFinite(start)) {
+      const out = [];
+      for (let i = start; i <= upper; i++) out.push(i);
+      return out;
+    }
+  }
+  // handle '<8' style: keep lower limit to 6 and upper to num-1
+  if (/^\s*<\s*\d+/.test(raw) && nums.length >= 1) {
+    const limit = Number(nums[0]);
+    const lower = 6;
+    const upper = Math.max(lower, limit - 1);
+    const out = [];
+    for (let i = lower; i <= upper; i++) out.push(i);
+    return out;
+  }
+  // comma separated or list of numbers
+  if (nums.length >= 1) {
+    return Array.from(new Set(nums.map(n => Number(n)).filter(n => Number.isFinite(n)))).sort((a, b) => a - b);
+  }
+  return [];
+};
+
+// Helper: parse grade strings into array of integers (individual grades)
+const parseGradeString = (s) => {
+  if (!s) return [];
+  const raw = String(s).trim();
+  const nums = raw.match(/\d+/g) || [];
+  if (raw.includes('-') && nums.length >= 2) {
+    const start = Number(nums[0]);
+    const end = Number(nums[1]);
+    if (Number.isFinite(start) && Number.isFinite(end) && end >= start) {
+      const out = [];
+      for (let i = start; i <= end; i++) out.push(i);
+      return out;
+    }
+  }
+  if (raw.includes('+') && nums.length >= 1) {
+    const start = Number(nums[0]);
+    const upper = 12; // assume grade cap at 12
+    if (Number.isFinite(start)) {
+      const out = [];
+      for (let i = start; i <= upper; i++) out.push(i);
+      return out;
+    }
+  }
+  if (nums.length >= 1) {
+    return Array.from(new Set(nums.map(n => Number(n)).filter(n => Number.isFinite(n)))).sort((a, b) => a - b);
+  }
+  return [];
+};
+
+// Helper: normalize deadline strings to YYYY-MM-DD when possible, fallback to year or original trimmed
+const monthMap = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, sept: 9, oct: 10, nov: 11, dec: 12 };
+const normalizeDeadline = (s) => {
+  if (!s) return '';
+  const raw = String(s).trim();
+  // try month name patterns like 'Aug 15 2024' or '15 Aug 2024'
+  let m = raw.match(/([A-Za-z]+)\s+(\d{1,2}),?\s*(20\d{2})/);
+  if (m) {
+    const mon = monthMap[m[1].toLowerCase().slice(0, 3)];
+    const day = Number(m[2]);
+    const year = Number(m[3]);
+    if (mon && day && year) return `${year.toString().padStart(4, '0')}-${String(mon).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  }
+  m = raw.match(/(\d{1,2})\s+([A-Za-z]+)\s*(20\d{2})/);
+  if (m) {
+    const day = Number(m[1]);
+    const mon = monthMap[m[2].toLowerCase().slice(0, 3)];
+    const year = Number(m[3]);
+    if (mon && day && year) return `${year.toString().padStart(4, '0')}-${String(mon).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  }
+  // try numeric D/M/Y or M/D/Y formats like 15/08/2024 or 08-15-2024
+  m = raw.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](20\d{2})/);
+  if (m) {
+    // we can't be sure of order; assume day/month/year if day>12 else month/day/year is ambiguous.
+    let a = Number(m[1]);
+    let b = Number(m[2]);
+    const year = Number(m[3]);
+    let day = a, mon = b;
+    if (a > 12) { day = a; mon = b; } else if (b > 12) { day = b; mon = a; } else { day = a; mon = b; }
+    return `${year.toString().padStart(4, '0')}-${String(mon).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  }
+  // try to extract a year
+  m = raw.match(/(20\d{2})/);
+  if (m) return m[1];
+  return raw;
+};
+
+const selectivity_mapping = {
+  "Highly Selective": "Highly Recommended",
+  "Selective": "Recommended",
+  "General": "Can be considered",
+  "Open": "Not Recommended"
+};
+
+// Top-level subject stream categories
+const TOP_LEVEL_SUBJECT_STREAMS = [
+  'Mathematics',
+  'STEM',
+  'Humanities',
+  'Commerce',
+  'Business',
+  'Arts & Media',
+  'Miscellaneous',
+  'Leadership',
+  'Multidisciplinary'
+];
+
+function CompetitionsListing() {
+  const [opportunities, setOpportunities] = useState([]);
+  const [filteredOpportunities, setFilteredOpportunities] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [filters, setFilters] = useState({
+    luRating: '',
+    luRemarks: '',
+    competitionValue: '',
+    competitionName: '',
+    host: '',
+    country: '',
+    subjectStream: '',
+    subjectDetails: '',
+    subject: '',
+    dataYear: '',
+    eligibilityDetails: '',
+    geographicAccess: '',
+    residency: '',
+    citizenship: '',
+    enrollmentRule: '',
+    age: '',
+    grade: '',
+    competitionType: '',
+    teamSize: '',
+    roundsStructure: '',
+    format: '',
+    formatDetails: '',
+    duration: '',
+    applicationRegistrationDeadline: '',
+    deadlinePassed: '',
+    allDeadlines: '',
+    officialLink: '',
+    cost: '',
+    costDetails: '',
+    awardsRecognition: '',
+    prestigeSelectivity: '',
+    applicationRequirements: '',
+    officialRules: ''
+  });
+  const [uiFilters, setUiFilters] = useState(() => ({
+    luRating: '', luRemarks: '', competitionValue: '', competitionName: '', host: '', country: '', subjectStream: '', subjectDetails: '', subject: '', dataYear: '', eligibilityDetails: '', geographicAccess: '', residency: '', citizenship: '', enrollmentRule: '', age: '', grade: '', competitionType: '', teamSize: '', roundsStructure: '', format: '', formatDetails: '', duration: '', applicationRegistrationDeadline: '', deadlinePassed: '', allDeadlines: '', officialLink: '', cost: '', costDetails: '', awardsRecognition: '', prestigeSelectivity: '', applicationRequirements: '', officialRules: ''
+  }));
+
+  useEffect(() => {
+    const params = {};
+    Object.keys(filters).forEach((key) => {
+      if (filters[key]) params[key] = filters[key];
+    });
+    setSearchParams(params);
+  }, [filters]);
+
+  useEffect(() => {
+
+    // keep UI in sync with filters when route params change
+    setUiFilters({
+      luRating: searchParams.get('luRating') || '',
+      luRemarks: searchParams.get('luRemarks') || '',
+      competitionValue: searchParams.get('competitionValue') || '',
+      competitionName: searchParams.get('competitionName') || '',
+      host: searchParams.get('host') || '',
+      country: searchParams.get('country') || '',
+      subjectStream: searchParams.get('subjectStream') || '',
+      subjectDetails: searchParams.get('subjectDetails') || '',
+      subject: searchParams.get('subject') || '',
+      dataYear: searchParams.get('dataYear') || '',
+      eligibilityDetails: searchParams.get('eligibilityDetails') || '',
+      geographicAccess: searchParams.get('geographicAccess') || '',
+      residency: searchParams.get('residency') || '',
+      citizenship: searchParams.get('citizenship') || '',
+      enrollmentRule: searchParams.get('enrollmentRule') || '',
+      age: searchParams.get('age') || '',
+      grade: searchParams.get('grade') || '',
+      competitionType: searchParams.get('competitionType') || '',
+      teamSize: searchParams.get('teamSize') || '',
+      roundsStructure: searchParams.get('roundsStructure') || '',
+      format: searchParams.get('format') || '',
+      formatDetails: searchParams.get('formatDetails') || '',
+      duration: searchParams.get('duration') || '',
+      applicationRegistrationDeadline: searchParams.get('applicationRegistrationDeadline') || '',
+      deadlinePassed: searchParams.get('deadlinePassed') || '',
+      allDeadlines: searchParams.get('allDeadlines') || '',
+      officialLink: searchParams.get('officialLink') || '',
+      cost: searchParams.get('cost') || '',
+      costDetails: searchParams.get('costDetails') || '',
+      awardsRecognition: searchParams.get('awardsRecognition') || '',
+      prestigeSelectivity: searchParams.get('prestigeSelectivity') || '',
+      applicationRequirements: searchParams.get('applicationRequirements') || '',
+      officialRules: searchParams.get('officialRules') || ''
+    });
+  }, [searchParams]);
+
+  useEffect(() => { loadInitialData(); }, []);
+
+  useEffect(() => {
+    let result = opportunities || [];
+    if (filters.luRating) result = result.filter(o => (o['LU Rating'] || '').toLowerCase().includes(filters.luRating.toLowerCase()));
+    if (filters.luRemarks) result = result.filter(o => (o['LU Remarks'] || '').toLowerCase().includes(filters.luRemarks.toLowerCase()));
+    if (filters.competitionValue) result = result.filter(o => (o['Competition Value'] || '').toLowerCase().includes(filters.competitionValue.toLowerCase()));
+    if (filters.competitionName) result = result.filter(o => (o['Competition Name'] || '').toLowerCase().includes(filters.competitionName.toLowerCase()));
+    if (filters.host) result = result.filter(o => (o['Organizing Body / Host Institution'] || '').toLowerCase().includes(filters.host.toLowerCase()));
+    if (filters.country) result = result.filter(o => (o['Country'] || '').toLowerCase().includes(filters.country.toLowerCase()));
+    if (filters.subjectStream) result = result.filter(o => (o['Subject Stream'] || '').toLowerCase().includes(filters.subjectStream.toLowerCase()));
+    if (filters.subjectDetails) result = result.filter(o => (o['Subject(s) Details from SOURCE'] || '').toLowerCase().includes(filters.subjectDetails.toLowerCase()));
+    if (filters.subject) result = result.filter(o => (o['Subject'] || '').toLowerCase().includes(filters.subject.toLowerCase()));
+    if (filters.dataYear) result = result.filter(o => (o['Data Year'] || '').toLowerCase().includes(filters.dataYear.toLowerCase()));
+    if (filters.eligibilityDetails) result = result.filter(o => (o['Eligibility Details from Source'] || '').toLowerCase().includes(filters.eligibilityDetails.toLowerCase()));
+    if (filters.geographicAccess) result = result.filter(o => (o['Geographic Access'] || '').toLowerCase().includes(filters.geographicAccess.toLowerCase()));
+    if (filters.residency) result = result.filter(o => (o['Residency'] || '').toLowerCase().includes(filters.residency.toLowerCase()));
+    if (filters.citizenship) result = result.filter(o => (o['Citizenship'] || '').toLowerCase().includes(filters.citizenship.toLowerCase()));
+    if (filters.enrollmentRule) result = result.filter(o => (o['Enrollment Rule'] || '').toLowerCase().includes(filters.enrollmentRule.toLowerCase()));
+    if (filters.age) {
+      const sel = Number(filters.age);
+      result = result.filter(o => Array.isArray(o._ageList) && o._ageList.includes(sel));
+    }
+    if (filters.grade) {
+      const sel = Number(filters.grade);
+      result = result.filter(o => Array.isArray(o._gradeList) && o._gradeList.includes(sel));
+    }
+    if (filters.competitionType) result = result.filter(o => (o['Competition Type'] || '').toLowerCase().includes(filters.competitionType.toLowerCase()));
+    if (filters.teamSize) result = result.filter(o => (o['Team Size'] || '').toLowerCase().includes(filters.teamSize.toLowerCase()));
+    if (filters.roundsStructure) result = result.filter(o => (o['Rounds / Structure'] || '').toLowerCase().includes(filters.roundsStructure.toLowerCase()));
+    if (filters.format) result = result.filter(o => (o['Format'] || '').toLowerCase().includes(filters.format.toLowerCase()));
+    if (filters.formatDetails) result = result.filter(o => (o['Format Details'] || '').toLowerCase().includes(filters.formatDetails.toLowerCase()));
+    if (filters.duration) result = result.filter(o => (o['Duration / Timeline'] || o['Duration/Timeline'] || '').toLowerCase().includes(filters.duration.toLowerCase()));
+    if (filters.applicationRegistrationDeadline) result = result.filter(o => (o['Application / Registration Deadline'] || '').toLowerCase().includes(filters.applicationRegistrationDeadline.toLowerCase()));
+    if (filters.deadlinePassed) result = result.filter(o => (o['Deadline Passed / Not'] || '').toLowerCase().includes(filters.deadlinePassed.toLowerCase()));
+    if (filters.allDeadlines) result = result.filter(o => (o['All Deadlines'] || '').toLowerCase().includes(filters.allDeadlines.toLowerCase()));
+    if (filters.officialLink) result = result.filter(o => (o['Official Link'] || '').toLowerCase().includes(filters.officialLink.toLowerCase()));
+    if (filters.cost) result = result.filter(o => (o['Cost'] || '').toLowerCase().includes(filters.cost.toLowerCase()));
+    if (filters.costDetails) result = result.filter(o => (o['Cost Details'] || '').toLowerCase().includes(filters.costDetails.toLowerCase()));
+    if (filters.awardsRecognition) result = result.filter(o => (o['Awards & Recognition'] || '').toLowerCase().includes(filters.awardsRecognition.toLowerCase()));
+    if (filters.prestigeSelectivity) result = result.filter(o => (o['Prestige / Selectivity'] || '').toLowerCase().includes(filters.prestigeSelectivity.toLowerCase()));
+    if (filters.applicationRequirements) result = result.filter(o => (o['Application Requirements'] || '').toLowerCase().includes(filters.applicationRequirements.toLowerCase()));
+    if (filters.officialRules) result = result.filter(o => (o['Official Rules'] || '').toLowerCase().includes(filters.officialRules.toLowerCase()));
+
+    if (searchQuery && searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      result = result.filter(opportunity => Object.values(opportunity).some(v => String(v || '').toLowerCase().includes(q)));
+    }
+
+    setFilteredOpportunities(result);
+    setCurrentPage(1);
+  }, [searchQuery, filters, opportunities]);
+
+  // Apply UI filters when user clicks Apply
+  const applyUiFilters = () => {
+    setFilters({ ...uiFilters });
+    toast("Filters Applied");
+  };
+
+  const clearUiFilters = () => {
+    const empty = Object.keys(uiFilters).reduce((acc, k) => ({ ...acc, [k]: '' }), {});
+    setUiFilters(empty);
+    setFilters(empty);
+    toast("Filters Cleared");
+  };
+
+  const loadInitialData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await loadExcelSheetFromAssets(EXCEL_FILE_NAME, SHEET_NAME);
+      // Normalize ages, grades and deadlines for consistent filtering/display
+      const processed = data.map((opp) => {
+        const copy = { ...opp };
+        try {
+          copy._ageList = parseAgeString(copy['Age'] || copy['Ages'] || '');
+        } catch (e) { copy._ageList = []; }
+        try {
+          copy._gradeList = parseGradeString(copy['Grade'] || '');
+        } catch (e) { copy._gradeList = []; }
+        const rawDl = copy['Application / Registration Deadline'] || copy['All Deadlines'] || '';
+        copy['Application / Registration Deadline'] = normalizeDeadline(rawDl);
+        copy['All Deadlines'] = normalizeDeadline(copy['All Deadlines'] || '');
+        return copy;
+      });
+
+      setOpportunities(processed);
+      setFilteredOpportunities(processed);
+      if (data.length > 0) {
+        const availableColumns = Object.keys(data[0]).filter(k => k !== 'id');
+        console.log('Competitions columns:', availableColumns);
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Could not load competitions sheet. Confirm LU Mastersheet.xlsx exists in public/assets and has a sheet named "Competitions Database"');
+      setOpportunities([]);
+      setFilteredOpportunities([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReloadOriginal = async () => { setSearchQuery(''); await loadInitialData(); };
+
+  const totalPages = Math.ceil(filteredOpportunities.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const currentOpportunities = filteredOpportunities.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  const uniqueCountries = Array.from(new Set(opportunities.map(o => (o['Country'] || '').trim()).filter(Boolean))).sort();
+  
+  // Extract top-level subject streams only
+  const uniqueSubjectStreams = Array.from(
+    new Set(
+      opportunities
+        .map(o => (o['Subject Stream'] || '').trim())
+        .filter(Boolean)
+    )
+  ).filter(stream => TOP_LEVEL_SUBJECT_STREAMS.includes(stream)).sort();
+
+  // Extract individual subjects (split by comma)
+  const uniqueSubjects = Array.from(
+    new Set(
+      opportunities
+        .flatMap(o =>
+          (o['Subject'] || '')
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean)
+        )
+    )
+  ).sort();
+
+  const uniqueFormats = Array.from(new Set(opportunities.map(o => ((o['Format'] || o['Format Details'] || '')).trim()).filter(Boolean))).sort();
+  const allGrades = opportunities.flatMap(o => (o._gradeList || []));
+  const uniqueGrades = Array.from(new Set(allGrades)).sort((a, b) => a - b).map(String);
+  
+  // derive individual ages from parsed age lists
+  const allAges = opportunities.flatMap(o => (o._ageList || []));
+  const uniqueAges = Array.from(new Set(allAges)).sort((a, b) => a - b).map(String);
+  
+  // Second priority filters
+  const uniqueSelectivity = Array.from(new Set(opportunities.map(o => (o['Prestige / Selectivity'] || '').trim()).filter(Boolean))).sort();
+  const uniqueCompetitionTypes = Array.from(new Set(opportunities.map(o => (o['Competition Type'] || '').trim()).filter(Boolean))).sort();
+  const uniqueTeamSizes = Array.from(new Set(opportunities.map(o => (o['Team Size'] || '').trim()).filter(Boolean))).sort();
+  const uniqueCosts = Array.from(new Set(opportunities.map(o => ((o['Cost'] || o['Cost Details'] || '')).trim()).filter(Boolean))).sort();
+  
+  // Additional filters for "More Filters"
+  const uniqueHosts = Array.from(new Set(opportunities.map(o => (o['Organizing Body / Host Institution'] || '').trim()).filter(Boolean))).sort();
+  const uniqueResidency = Array.from(new Set(opportunities.map(o => (o['Residency'] || '').trim()).filter(Boolean))).sort();
+  const uniqueCitizenship = Array.from(new Set(opportunities.map(o => (o['Citizenship'] || '').trim()).filter(Boolean))).sort();
+  const uniqueDataYears = Array.from(new Set(opportunities.map(o => (o['Data Year'] || '').trim()).filter(Boolean))).sort();
+
+  return (
+    <div className="app">
+      <header className="app-header">
+        <div className="container">
+          <div className="header-content">
+            <div>
+              <p className="app-subtitle">Competitions</p>
+            </div>
+            <div className="upload-buttons">
+              <button type="button" className="reload-button" onClick={handleReloadOriginal} disabled={loading}><i className="fa-solid fa-arrow-rotate-right"></i> Reload Competitions</button>
+            </div>
+          </div>
+        </div>
+      </header>
+      <div className='competitions-body-container'>
+        <div className="competitions-sidebar">
+          <div className="upload-section">
+
+          </div>
+
+          <div style={{ position: 'sticky', top: 0, borderRadius: '20px', backgroundColor: '#ffffff3c', backdropFilter: 'blur(10px)', padding: '20px 10px' }}>
+
+            {opportunities.length > 0 && (<SearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />)}
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button className="navbar-btn" style={{ backgroundColor: '#24c542' }} onClick={applyUiFilters}><i className="fa-solid fa-filter"></i> Apply Filters</button>
+              <button className="navbar-btn" style={{ backgroundColor: '#c56224' }} onClick={clearUiFilters}><i className="fa-solid fa-times"></i> Clear Filters</button>
+            </div>
+          {opportunities.length > 0 && (
+            <div className="file-info"><span className="file-count">
+              {filteredOpportunities.length === opportunities.length
+                ? `${opportunities.length} competitions loaded`
+                : `Showing ${filteredOpportunities.length} of ${opportunities.length} competitions`
+              }
+            </span></div>
+          )}
+          </div>
+          <br />
+          <div className="filters-container competitions-filters-container">
+            {/* Top Priority Filters */}
+            <select value={uiFilters.subjectStream} onChange={(e) => setUiFilters({ ...uiFilters, subjectStream: e.target.value })}>
+              <option value="">All Subject Streams</option>
+              {uniqueSubjectStreams.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+
+            <select value={uiFilters.subject} onChange={(e) => setUiFilters({ ...uiFilters, subject: e.target.value })}>
+              <option value="">All Subjects</option>
+              {uniqueSubjects.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+
+            <select value={uiFilters.grade} onChange={(e) => setUiFilters({ ...uiFilters, grade: e.target.value })}>
+              <option value="">All Grades</option>
+              {uniqueGrades.map(g => <option key={g} value={g}>{g}</option>)}
+            </select>
+
+            <select value={uiFilters.country} onChange={(e) => setUiFilters({ ...uiFilters, country: e.target.value })}>
+              <option value="">All Countries</option>
+              {uniqueCountries.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+
+            <select value={uiFilters.format} onChange={(e) => setUiFilters({ ...uiFilters, format: e.target.value })}>
+              <option value="">All Formats</option>
+              {uniqueFormats.map(f => <option key={f} value={f}>{f}</option>)}
+            </select>
+
+            {/* Second Priority Filters */}
+            <select value={uiFilters.cost} onChange={(e) => setUiFilters({ ...uiFilters, cost: e.target.value })}>
+              <option value="">All Costs</option>
+              {uniqueCosts.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+
+            <select value={uiFilters.prestigeSelectivity} onChange={(e) => setUiFilters({ ...uiFilters, prestigeSelectivity: e.target.value })}>
+              <option value="">All Selectivity</option>
+              {uniqueSelectivity.map(s => <option key={s} value={s}>{selectivity_mapping[s] || s}</option>)}
+            </select>
+
+            <select value={uiFilters.competitionType} onChange={(e) => setUiFilters({ ...uiFilters, competitionType: e.target.value })}>
+              <option value="">All Competition Types</option>
+              {uniqueCompetitionTypes.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+
+            <select value={uiFilters.teamSize} onChange={(e) => setUiFilters({ ...uiFilters, teamSize: e.target.value })}>
+              <option value="">All Team Sizes</option>
+              {uniqueTeamSizes.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+
+            {/* Additional Filters - Collapsible */}
+            <details style={{ width: '100%' }}>
+              <summary style={{ cursor: 'pointer' }}>More Filters</summary>
+              <div style={{ display: 'flex', maxWidth: '100%', flexWrap: 'wrap', gap: '8px', marginTop: '10px' }}>
+                <select value={uiFilters.host} onChange={(e) => setUiFilters({ ...uiFilters, host: e.target.value })} style={{ flex: '1 1 calc(50% - 4px)', minWidth: '150px' }}>
+                  <option value="">All Hosts</option>
+                  {uniqueHosts.map(h => <option key={h} value={h}>{h}</option>)}
+                </select>
+
+                <select value={uiFilters.age} onChange={(e) => setUiFilters({ ...uiFilters, age: e.target.value })} style={{ flex: '1 1 calc(50% - 4px)', minWidth: '150px' }}>
+                  <option value="">All Ages</option>
+                  {uniqueAges.map(a => <option key={a} value={a}>{a}</option>)}
+                </select>
+
+                <select value={uiFilters.residency} onChange={(e) => setUiFilters({ ...uiFilters, residency: e.target.value })} style={{ flex: '1 1 calc(50% - 4px)', minWidth: '150px' }}>
+                  <option value="">All Residency</option>
+                  {uniqueResidency.map(v => <option key={v} value={v}>{v}</option>)}
+                </select>
+
+                <select value={uiFilters.citizenship} onChange={(e) => setUiFilters({ ...uiFilters, citizenship: e.target.value })} style={{ flex: '1 1 calc(50% - 4px)', minWidth: '150px' }}>
+                  <option value="">All Citizenship</option>
+                  {uniqueCitizenship.map(v => <option key={v} value={v}>{v}</option>)}
+                </select>
+
+                <select value={uiFilters.dataYear} onChange={(e) => setUiFilters({ ...uiFilters, dataYear: e.target.value })} style={{ flex: '1 1 calc(50% - 4px)', minWidth: '150px' }}>
+                  <option value="">All Data Years</option>
+                  {uniqueDataYears.map(v => <option key={v} value={v}>{v}</option>)}
+                </select>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <main className="competitions-content-container">
+          <div>
+
+
+            {error && <div className="error-message">{error}</div>}
+            {loading && <div className="loading-container"><div className="spinner"></div><p>Loading competitions...</p></div>}
+
+            {!loading && filteredOpportunities.length > 0 && (
+              <>
+                <div className="opportunities-grid">
+                  {currentOpportunities.map((opportunity, index) => (
+                    <OpportunityCardCompetition key={opportunity.id} opportunity={opportunity} index={startIndex + index} />
+                  ))}
+                </div>
+                {totalPages > 1 && (<Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={(p) => { setCurrentPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }) }} />)}
+              </>
+            )}
+
+            {!loading && opportunities.length === 0 && !error && (
+              <div className="empty-state"><h3>No competitions found</h3><p>Reload or add LU Mastersheet.xlsx with an "Competitions" sheet.</p></div>
+            )}
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+export default CompetitionsListing;

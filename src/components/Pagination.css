@@ -70,25 +70,6 @@
   font-weight: 500;
 }
 
-[data-theme="dark"] .pagination-btn,
-[data-theme="dark"] .pagination-number {
-  background: #1f2937;
-  border-color: #4b5563;
-  color: #e5e7eb;
-}
-
-[data-theme="dark"] .pagination-btn:hover:not(:disabled),
-[data-theme="dark"] .pagination-number:hover {
-  background: #374151;
-  border-color: #667eea;
-  color: #a5b4fc;
-}
-
-[data-theme="dark"] .pagination-number.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-color: #667eea;
-}
 
 @media (max-width: 768px) {
   .pagination {
