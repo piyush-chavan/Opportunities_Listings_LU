@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import OpportunityCardInternship from './OpportunityCardInternship';
+import InternshipTableCard from './InternshipTableCard';
 import Pagination from './Pagination';
 import SearchBar from './SearchBar';
 import { loadExcelSheetFromAssets } from '../utils/excelParser';
@@ -125,6 +125,18 @@ const selectivity_mapping = {
   "Open": "Not Recommended"
 }
 
+const TOP_LEVEL_SUBJECT_STREAMS = [
+  'Mathematics',
+  'STEM',
+  'Humanities',
+  'Commerce',
+  'Business',
+  'Arts & Media',
+  'Miscellaneous',
+  'Leadership',
+  'Multidisciplinary'
+];
+
 function InternshipsListing() {
   const [opportunities, setOpportunities] = useState([]);
   const [filteredOpportunities, setFilteredOpportunities] = useState([]);
@@ -153,20 +165,56 @@ function InternshipsListing() {
     enrollmentRule: '',
     age: '',
     grade: '',
+    cohortGroupSize: '',
     format: '',
     formatDetails: '',
     duration: '',
+    deadline: '',
+    deadlinePassed: '',
     applicationBefore: '',
     allDeadlines: '',
     officialLink: '',
     cost: '',
     costDetails: '',
+    compensationBenefits: '',
     selectivity: '',
     source: '',
     tagging: ''
   });
   const [uiFilters, setUiFilters] = useState(() => ({
-    luRating: '', luRemarks: '', programValue: '', notes: '', programName: '', host: '', country: '', subjectStream: '', subjectDetails: '', subject: '', dataYear: '', eligibility: '', geographicAccess: '', residency: '', citizenship: '', enrollmentRule: '', age: '', grade: '', format: '', formatDetails: '', duration: '', applicationBefore: '', allDeadlines: '', officialLink: '', cost: '', costDetails: '', selectivity: '', source: '', tagging: ''
+    luRating: '',
+    luRemarks: '',
+    programValue: '',
+    notes: '',
+    programName: '',
+    host: '',
+    country: '',
+    subjectStream: '',
+    subjectDetails: '',
+    subject: '',
+    dataYear: '',
+    eligibility: '',
+    geographicAccess: '',
+    residency: '',
+    citizenship: '',
+    enrollmentRule: '',
+    age: '',
+    grade: '',
+    cohortGroupSize: '',
+    format: '',
+    formatDetails: '',
+    duration: '',
+    deadline: '',
+    deadlinePassed: '',
+    applicationBefore: '',
+    allDeadlines: '',
+    officialLink: '',
+    cost: '',
+    costDetails: '',
+    compensationBenefits: '',
+    selectivity: '',
+    source: '',
+    tagging: ''
   }));
 
   useEffect(() => {
@@ -184,19 +232,33 @@ function InternshipsListing() {
       luRating: searchParams.get('luRating') || '',
       luRemarks: searchParams.get('luRemarks') || '',
       programValue: searchParams.get('programValue') || '',
+      notes: searchParams.get('notes') || '',
+      programName: searchParams.get('programName') || '',
       host: searchParams.get('host') || '',
       country: searchParams.get('country') || '',
       subjectStream: searchParams.get('subjectStream') || '',
+      subjectDetails: searchParams.get('subjectDetails') || '',
       subject: searchParams.get('subject') || '',
       dataYear: searchParams.get('dataYear') || '',
+      eligibility: searchParams.get('eligibility') || '',
+      geographicAccess: searchParams.get('geographicAccess') || '',
       residency: searchParams.get('residency') || '',
       citizenship: searchParams.get('citizenship') || '',
+      enrollmentRule: searchParams.get('enrollmentRule') || '',
       age: searchParams.get('age') || '',
       grade: searchParams.get('grade') || '',
+      cohortGroupSize: searchParams.get('cohortGroupSize') || '',
       format: searchParams.get('format') || '',
+      formatDetails: searchParams.get('formatDetails') || '',
       duration: searchParams.get('duration') || '',
+      deadline: searchParams.get('deadline') || '',
+      deadlinePassed: searchParams.get('deadlinePassed') || '',
       applicationBefore: searchParams.get('applicationBefore') || '',
+      allDeadlines: searchParams.get('allDeadlines') || '',
+      officialLink: searchParams.get('officialLink') || '',
       cost: searchParams.get('cost') || '',
+      costDetails: searchParams.get('costDetails') || '',
+      compensationBenefits: searchParams.get('compensationBenefits') || '',
       selectivity: searchParams.get('selectivity') || '',
       source: searchParams.get('source') || '',
       tagging: searchParams.get('tagging') || ''
@@ -212,8 +274,11 @@ function InternshipsListing() {
     if (filters.programValue) result = result.filter(o => (o['Program Value'] || '').toLowerCase().includes(filters.programValue.toLowerCase()));
     if (filters.host) result = result.filter(o => (o['Host Institution / Organizer'] || '').toLowerCase().includes(filters.host.toLowerCase()));
     if (filters.country) result = result.filter(o => (o['Country'] || '').toLowerCase().includes(filters.country.toLowerCase()));
-    if (filters.subjectStream) result = result.filter(o => (o['Subject Stream'] || '').toLowerCase().includes(filters.subjectStream.toLowerCase()));
-    if (filters.subject) result = result.filter(o => (o['Subject'] || '').toLowerCase().includes(filters.subject.toLowerCase()));
+    if (filters.subjectStream) result = result.filter(o => {
+      const values = String(o['Subject Stream'] || '').split(/[,;]/).map(v => v.trim().toLowerCase()).filter(Boolean);
+      return values.includes(filters.subjectStream.toLowerCase());
+    });
+    if (filters.subject) result = result.filter(o => Array.isArray(o._subjectList) && o._subjectList.some(s => s.toLowerCase() === filters.subject.toLowerCase()));
     if (filters.dataYear) result = result.filter(o => (o['Data Year'] || '').toLowerCase().includes(filters.dataYear.toLowerCase()));
     if (filters.residency) result = result.filter(o => (o['Residency'] || '').toLowerCase().includes(filters.residency.toLowerCase()));
     if (filters.citizenship) result = result.filter(o => (o['Citizenship'] || '').toLowerCase().includes(filters.citizenship.toLowerCase()));
@@ -225,15 +290,23 @@ function InternshipsListing() {
       const sel = Number(filters.grade);
       result = result.filter(o => Array.isArray(o._gradeList) && o._gradeList.includes(sel));
     }
+    if (filters.cohortGroupSize) result = result.filter(o => (o['Cohort / Group Size'] || '').toLowerCase().includes(filters.cohortGroupSize.toLowerCase()));
     if (filters.format) result = result.filter(o => (o['Format'] || o['Format Details'] || '').toLowerCase().includes(filters.format.toLowerCase()));
-    if (filters.duration) result = result.filter(o => (o['Duration/Timeline'] || o['Duration / Timeline'] || '').toLowerCase().includes(filters.duration.toLowerCase()));
-    if (filters.selectivity) result = result.filter(o => (o['Selectivity'] || '').toLowerCase().includes(filters.selectivity.toLowerCase()));
+    if (filters.duration) result = result.filter(o => (o['Duration / Timeline'] || o['Duration / Structure'] || '').toLowerCase().includes(filters.duration.toLowerCase()));
+    if (filters.deadline) result = result.filter(o => {
+      const deadline = String(o['Application / Registration Deadline'] || '').trim().toLowerCase();
+      const allDeadlines = String(o['All Deadlines'] || '').trim().toLowerCase();
+      return deadline === filters.deadline.toLowerCase() || allDeadlines === filters.deadline.toLowerCase();
+    });
+    if (filters.deadlinePassed) result = result.filter(o => (o['Deadline Passed / Not'] || '').toLowerCase().includes(filters.deadlinePassed.toLowerCase()));
+    if (filters.selectivity) result = result.filter(o => (o['Prestige / Selectivity'] || '').toLowerCase().includes(filters.selectivity.toLowerCase()));
     if (filters.cost) result = result.filter(o => (o['Cost'] || '').toLowerCase().includes(filters.cost.toLowerCase()));
+    if (filters.compensationBenefits) result = result.filter(o => (o['Compensation & Benefits'] || '').toLowerCase().includes(filters.compensationBenefits.toLowerCase()));
     if (filters.source) result = result.filter(o => (o['Source'] || '').toLowerCase().includes(filters.source.toLowerCase()));
     if (filters.tagging) result = result.filter(o => (o['Tagging'] || '').toLowerCase().includes(filters.tagging.toLowerCase()));
     if (filters.applicationBefore) {
       result = result.filter(o => {
-        const dl = o['Application Deadline'] || o['All Deadlines'] || '';
+        const dl = o['Application / Registration Deadline'] || o['All Deadlines'] || '';
         const m = String(dl).match(/\b(20\d{2})\b/);
         if (!m) return false;
         const year = Number(m[1]);
@@ -277,9 +350,17 @@ function InternshipsListing() {
         try {
           copy._gradeList = parseGradeString(copy['Grade'] || '');
         } catch (e) { copy._gradeList = []; }
+        try {
+          copy._subjectList = String(copy['Subject'] || '')
+            .split(/[,;]/)
+            .map(v => v.trim())
+            .filter(Boolean);
+        } catch (e) {
+          copy._subjectList = [];
+        }
         // Normalize deadlines
-        const rawDl = copy['Application Deadline'] || copy['All Deadlines'] || '';
-        copy['Application Deadline'] = normalizeDeadline(rawDl);
+        const rawDl = copy['Application / Registration Deadline'] || copy['All Deadlines'] || '';
+        copy['Application / Registration Deadline'] = normalizeDeadline(rawDl);
         copy['All Deadlines'] = normalizeDeadline(copy['All Deadlines'] || '');
         return copy;
       });
@@ -308,31 +389,28 @@ function InternshipsListing() {
   const currentOpportunities = filteredOpportunities.slice(startIndex, endIndex);
 
   const uniqueCountries = Array.from(new Set(opportunities.map(o => (o['Country'] || '').trim()).filter(Boolean))).sort();
-  // const uniqueSubjects = Array.from(new Set(opportunities.map(o => ((o['Subject Stream']||o['Subject(s) Details from SOURCE']||'')).trim()).filter(Boolean))).sort();
-  const uniqueSubjects = Array.from(
-    new Set(
-      opportunities
-        .flatMap(o =>
-          (o['Subject Stream'] || '')
-            .split(',')                 // split by comma
-            .map(s => s.trim())        // clean spaces
-            .filter(Boolean)           // remove empty
-        )
-    )
-  ).sort();
+  const uniqueSubjects = Array.from(new Set(opportunities.flatMap(o =>
+    String(o['Subject'] || '')
+      .split(/[,;]/)
+      .map(s => s.trim())
+      .filter(Boolean)
+  ))).sort();
   const uniqueFormats = Array.from(new Set(opportunities.map(o => ((o['Format'] || o['Format Details'] || '')).trim()).filter(Boolean))).sort();
   const allGrades = opportunities.flatMap(o => (o._gradeList || []));
   const uniqueGrades = Array.from(new Set(allGrades)).sort((a, b) => a - b).map(String);
-  // derive individual ages from parsed age lists
   const allAges = opportunities.flatMap(o => (o._ageList || []));
   const uniqueAges = Array.from(new Set(allAges)).sort((a, b) => a - b).map(String);
-  const uniqueSelectivity = Array.from(new Set(opportunities.map(o => (o['Selectivity'] || '').trim()).filter(Boolean))).sort();
-  const uniqueHosts = Array.from(new Set(opportunities.map(o => (o['Host Institution / Organizer'] || '').trim()).filter(Boolean))).sort();
-  const uniqueEligibility = Array.from(new Set(opportunities.map(o => (o['Eligibility Details from SOURCE'] || o['Eligibility'] || '').trim()).filter(Boolean))).sort();
+  const uniqueDeadlines = Array.from(new Set(opportunities.flatMap(o => [o['Application / Registration Deadline'], o['All Deadlines']].filter(Boolean)))).sort();
+  const uniqueSelectivity = Array.from(new Set(opportunities.map(o => (o['Prestige / Selectivity'] || '').trim()).filter(Boolean))).sort();
+  const uniqueHosts = Array.from(new Set(opportunities.map(o => (o['Organizing Body / Host Institution'] || '').trim()).filter(Boolean))).sort();
+  const uniqueGeographicAccess = Array.from(new Set(opportunities.map(o => (o['Geographic Access'] || '').trim()).filter(Boolean))).sort();
   const uniqueResidency = Array.from(new Set(opportunities.map(o => (o['Residency'] || '').trim()).filter(Boolean))).sort();
   const uniqueCitizenship = Array.from(new Set(opportunities.map(o => (o['Citizenship'] || '').trim()).filter(Boolean))).sort();
-  const uniqueEnrollment = Array.from(new Set(opportunities.map(o => (o['Enrollment Rule (School)'] || '').trim()).filter(Boolean))).sort();
-  const uniqueDurations = Array.from(new Set(opportunities.map(o => ((o['Duration/Timeline'] || o['Duration / Timeline'] || '')).trim()).filter(Boolean))).sort();
+  const uniqueEnrollment = Array.from(new Set(opportunities.map(o => (o['Enrollment Rule'] || '').trim()).filter(Boolean))).sort();
+  const uniqueCohortGroupSizes = Array.from(new Set(opportunities.map(o => (o['Cohort / Group Size'] || '').trim()).filter(Boolean))).sort();
+  const uniqueCompensationBenefits = Array.from(new Set(opportunities.map(o => (o['Compensation & Benefits'] || '').trim()).filter(Boolean))).sort();
+  const uniqueDeadlineStatuses = Array.from(new Set(opportunities.map(o => (o['Deadline Passed / Not'] || '').trim()).filter(Boolean))).sort();
+  const uniqueDurations = Array.from(new Set(opportunities.map(o => ((o['Duration / Timeline'] || o['Duration / Structure'] || '')).trim()).filter(Boolean))).sort();
   const uniqueProgramValues = Array.from(new Set(opportunities.map(o => (o['Program Value'] || '').trim()).filter(Boolean))).sort();
   const uniqueDataYears = Array.from(new Set(opportunities.map(o => (o['Data Year'] || '').trim()).filter(Boolean))).sort();
   const uniqueCosts = Array.from(new Set(opportunities.map(o => ((o['Cost'] || o['Cost Details'] || '')).trim()).filter(Boolean))).sort();
@@ -357,7 +435,7 @@ function InternshipsListing() {
 
           </div>
 
-          <div style={{ position: 'sticky', top: 0, borderRadius: '20px', backgroundColor: '#413f3f7d', backdropFilter: 'blur(10px)', padding: '20px 10px' }}>
+          <div style={{ position: 'sticky', top: 0, borderRadius: '20px', backgroundColor: '#ececec7d', backdropFilter: 'blur(10px)', padding: '20px 10px' }}>
 
             {opportunities.length > 0 && (<SearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />)}
             <div style={{ display: 'flex', gap: 8 }}>
@@ -375,6 +453,10 @@ function InternshipsListing() {
           )}
           <br />
           <div className="filters-container internships-filters-container">
+            <select value={uiFilters.subjectStream} onChange={(e) => setUiFilters({ ...uiFilters, subjectStream: e.target.value })}>
+              <option value="">All Subject Streams</option>
+              {TOP_LEVEL_SUBJECT_STREAMS.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
             <select value={uiFilters.subject} onChange={(e) => setUiFilters({ ...uiFilters, subject: e.target.value })}>
               <option value="">All Subjects</option>
               {uniqueSubjects.map(s => <option key={s} value={s}>{s}</option>)}
@@ -382,6 +464,10 @@ function InternshipsListing() {
             <select value={uiFilters.grade} onChange={(e) => setUiFilters({ ...uiFilters, grade: e.target.value })}>
               <option value="">All Grades</option>
               {uniqueGrades.map(g => <option key={g} value={g}>{g}</option>)}
+            </select>
+            <select value={uiFilters.deadline} onChange={(e) => setUiFilters({ ...uiFilters, deadline: e.target.value })}>
+              <option value="">All Deadlines</option>
+              {uniqueDeadlines.map(d => <option key={d} value={d}>{d}</option>)}
             </select>
             <select value={uiFilters.country} onChange={(e) => setUiFilters({ ...uiFilters, country: e.target.value })}>
               <option value="">All Countries</option>
@@ -393,45 +479,48 @@ function InternshipsListing() {
             </select>
             <select value={uiFilters.selectivity} onChange={(e) => setUiFilters({ ...uiFilters, selectivity: e.target.value })}>
               <option value="">All Selectivity</option>
-              {uniqueSelectivity.map(s => <option key={s} value={s}>{selectivity_mapping[s]}</option>)}
+              {uniqueSelectivity.map(s => <option key={s} value={s}>{selectivity_mapping[s] || s}</option>)}
+            </select>
+            <select value={uiFilters.cost} onChange={(e) => setUiFilters({ ...uiFilters, cost: e.target.value })}>
+              <option value="">All Costs</option>
+              {uniqueCosts.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <select value={uiFilters.compensationBenefits} onChange={(e) => setUiFilters({ ...uiFilters, compensationBenefits: e.target.value })}>
+              <option value="">All Compensation</option>
+              {uniqueCompensationBenefits.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <select value={uiFilters.selectivity} onChange={(e) => setUiFilters({ ...uiFilters, selectivity: e.target.value })}>
+              <option value="">All Selectivity</option>
+              {uniqueSelectivity.map(s => <option key={s} value={s}>{selectivity_mapping[s] || s}</option>)}
+            </select>
+            <select value={uiFilters.geographicAccess} onChange={(e) => setUiFilters({ ...uiFilters, geographicAccess: e.target.value })}>
+              <option value="">All Geographic Access</option>
+              {uniqueGeographicAccess.map(v => <option key={v} value={v}>{v}</option>)}
+            </select>
+            <select value={uiFilters.residency} onChange={(e) => setUiFilters({ ...uiFilters, residency: e.target.value })}>
+              <option value="">All Residency</option>
+              {uniqueResidency.map(v => <option key={v} value={v}>{v}</option>)}
+            </select>
+            <select value={uiFilters.citizenship} onChange={(e) => setUiFilters({ ...uiFilters, citizenship: e.target.value })}>
+              <option value="">All Citizenship</option>
+              {uniqueCitizenship.map(v => <option key={v} value={v}>{v}</option>)}
             </select>
             <select value={uiFilters.age} onChange={(e) => setUiFilters({ ...uiFilters, age: e.target.value })}>
               <option value="">All Ages</option>
               {uniqueAges.map(a => <option key={a} value={a}>{a}</option>)}
             </select>
-            <select value={uiFilters.host} onChange={(e) => setUiFilters({ ...uiFilters, host: e.target.value })}>
-              <option value="">All Hosts</option>
-              {uniqueHosts.map(h => <option key={h} value={h}>{h}</option>)}
+            <select value={uiFilters.enrollmentRule} onChange={(e) => setUiFilters({ ...uiFilters, enrollmentRule: e.target.value })}>
+              <option value="">All Enrollment Rules</option>
+              {uniqueEnrollment.map(v => <option key={v} value={v}>{v}</option>)}
             </select>
-
-
-
-
-            <select value={uiFilters.residency} onChange={(e) => setUiFilters({ ...uiFilters, residency: e.target.value })}>
-              <option value="">All Residency</option>
-              {uniqueResidency.map(v => <option key={v} value={v}>{v}</option>)}
+            <select value={uiFilters.cohortGroupSize} onChange={(e) => setUiFilters({ ...uiFilters, cohortGroupSize: e.target.value })}>
+              <option value="">All Cohort / Group Sizes</option>
+              {uniqueCohortGroupSizes.map(v => <option key={v} value={v}>{v}</option>)}
             </select>
-
-            <select value={uiFilters.citizenship} onChange={(e) => setUiFilters({ ...uiFilters, citizenship: e.target.value })}>
-              <option value="">All Citizenship</option>
-              {uniqueCitizenship.map(v => <option key={v} value={v}>{v}</option>)}
-            </select>
-
-
-
             <select value={uiFilters.dataYear} onChange={(e) => setUiFilters({ ...uiFilters, dataYear: e.target.value })}>
               <option value="">Data Years</option>
               {uniqueDataYears.map(v => <option key={v} value={v}>{v}</option>)}
             </select>
-
-            <select value={uiFilters.cost} onChange={(e) => setUiFilters({ ...uiFilters, cost: e.target.value })}>
-              <option value="">All Costs</option>
-              {uniqueCosts.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-
-
-
-
 
           </div>
         </div>
@@ -447,7 +536,7 @@ function InternshipsListing() {
               <>
                 <div className="opportunities-grid">
                   {currentOpportunities.map((opportunity, index) => (
-                    <OpportunityCardInternship key={opportunity.id} opportunity={opportunity} index={startIndex + index} />
+                    <InternshipTableCard key={opportunity.id} opportunity={opportunity} index={startIndex + index} />
                   ))}
                 </div>
                 {totalPages > 1 && (<Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={(p) => { setCurrentPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }) }} />)}

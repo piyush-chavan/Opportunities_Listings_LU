@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import OpportunityCardInternship from './OpportunityCardInternship';
+import ScholarshipTableCard from './ScholarshipTableCard';
 import Pagination from './Pagination';
 import SearchBar from './SearchBar';
 import { loadExcelSheetFromAssets } from '../utils/excelParser';
@@ -135,38 +135,23 @@ function ScholarshipsListing() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [filters, setFilters] = useState({
-    luRating: '',
-    luRemarks: '',
-    programValue: '',
-    notes: '',
-    programName: '',
-    host: '',
-    country: '',
     subjectStream: '',
-    subjectDetails: '',
-    subject: '',
-    dataYear: '',
-    eligibility: '',
+    grade: '',
+    applicationBefore: '',
+    country: '',
+    scholarshipType: '',
+    awardAmount: '',
+    renewable: '',
+    selectivity: '',
+    awardingOrganization: '',
     geographicAccess: '',
     residency: '',
     citizenship: '',
-    enrollmentRule: '',
     age: '',
-    grade: '',
-    format: '',
-    formatDetails: '',
-    duration: '',
-    applicationBefore: '',
-    allDeadlines: '',
-    officialLink: '',
-    cost: '',
-    costDetails: '',
-    selectivity: '',
-    source: '',
-    tagging: ''
+    enrollmentRule: ''
   });
   const [uiFilters, setUiFilters] = useState(() => ({
-    luRating: '', luRemarks: '', programValue: '', notes: '', programName: '', host: '', country: '', subjectStream: '', subjectDetails: '', subject: '', dataYear: '', eligibility: '', geographicAccess: '', residency: '', citizenship: '', enrollmentRule: '', age: '', grade: '', format: '', formatDetails: '', duration: '', applicationBefore: '', allDeadlines: '', officialLink: '', cost: '', costDetails: '', selectivity: '', source: '', tagging: ''
+    subjectStream: '', grade: '', applicationBefore: '', country: '', scholarshipType: '', awardAmount: '', renewable: '', selectivity: '', awardingOrganization: '', geographicAccess: '', residency: '', citizenship: '', age: '', enrollmentRule: ''
   }));
 
   useEffect(() => {
@@ -181,25 +166,20 @@ function ScholarshipsListing() {
 
     // keep UI in sync with filters when route params change
     setUiFilters({
-      luRating: searchParams.get('luRating') || '',
-      luRemarks: searchParams.get('luRemarks') || '',
-      programValue: searchParams.get('programValue') || '',
-      host: searchParams.get('host') || '',
-      country: searchParams.get('country') || '',
       subjectStream: searchParams.get('subjectStream') || '',
-      subject: searchParams.get('subject') || '',
-      dataYear: searchParams.get('dataYear') || '',
+      grade: searchParams.get('grade') || '',
+      applicationBefore: searchParams.get('applicationBefore') || '',
+      country: searchParams.get('country') || '',
+      scholarshipType: searchParams.get('scholarshipType') || '',
+      awardAmount: searchParams.get('awardAmount') || '',
+      renewable: searchParams.get('renewable') || '',
+      selectivity: searchParams.get('selectivity') || '',
+      awardingOrganization: searchParams.get('awardingOrganization') || '',
+      geographicAccess: searchParams.get('geographicAccess') || '',
       residency: searchParams.get('residency') || '',
       citizenship: searchParams.get('citizenship') || '',
       age: searchParams.get('age') || '',
-      grade: searchParams.get('grade') || '',
-      format: searchParams.get('format') || '',
-      duration: searchParams.get('duration') || '',
-      applicationBefore: searchParams.get('applicationBefore') || '',
-      cost: searchParams.get('cost') || '',
-      selectivity: searchParams.get('selectivity') || '',
-      source: searchParams.get('source') || '',
-      tagging: searchParams.get('tagging') || ''
+      enrollmentRule: searchParams.get('enrollmentRule') || ''
     });
   }, [searchParams]);
 
@@ -207,30 +187,11 @@ function ScholarshipsListing() {
 
   useEffect(() => {
     let result = opportunities || [];
-    if (filters.luRating) result = result.filter(o => (o['LU Rating'] || '').toLowerCase().includes(filters.luRating.toLowerCase()));
-    if (filters.luRemarks) result = result.filter(o => (o['LU Remarks'] || '').toLowerCase().includes(filters.luRemarks.toLowerCase()));
-    if (filters.programValue) result = result.filter(o => (o['Program Value'] || '').toLowerCase().includes(filters.programValue.toLowerCase()));
-    if (filters.host) result = result.filter(o => (o['Host Institution / Organizer'] || '').toLowerCase().includes(filters.host.toLowerCase()));
-    if (filters.country) result = result.filter(o => (o['Country'] || '').toLowerCase().includes(filters.country.toLowerCase()));
     if (filters.subjectStream) result = result.filter(o => (o['Subject Stream'] || '').toLowerCase().includes(filters.subjectStream.toLowerCase()));
-    if (filters.subject) result = result.filter(o => (o['Subject'] || '').toLowerCase().includes(filters.subject.toLowerCase()));
-    if (filters.dataYear) result = result.filter(o => (o['Data Year'] || '').toLowerCase().includes(filters.dataYear.toLowerCase()));
-    if (filters.residency) result = result.filter(o => (o['Residency'] || '').toLowerCase().includes(filters.residency.toLowerCase()));
-    if (filters.citizenship) result = result.filter(o => (o['Citizenship'] || '').toLowerCase().includes(filters.citizenship.toLowerCase()));
-    if (filters.age) {
-      const sel = Number(filters.age);
-      result = result.filter(o => Array.isArray(o._ageList) && o._ageList.includes(sel));
-    }
     if (filters.grade) {
       const sel = Number(filters.grade);
       result = result.filter(o => Array.isArray(o._gradeList) && o._gradeList.includes(sel));
     }
-    if (filters.format) result = result.filter(o => (o['Format'] || o['Format Details'] || '').toLowerCase().includes(filters.format.toLowerCase()));
-    if (filters.duration) result = result.filter(o => (o['Duration/Timeline'] || o['Duration / Timeline'] || '').toLowerCase().includes(filters.duration.toLowerCase()));
-    if (filters.selectivity) result = result.filter(o => (o['Selectivity'] || '').toLowerCase().includes(filters.selectivity.toLowerCase()));
-    if (filters.cost) result = result.filter(o => (o['Cost'] || '').toLowerCase().includes(filters.cost.toLowerCase()));
-    if (filters.source) result = result.filter(o => (o['Source'] || '').toLowerCase().includes(filters.source.toLowerCase()));
-    if (filters.tagging) result = result.filter(o => (o['Tagging'] || '').toLowerCase().includes(filters.tagging.toLowerCase()));
     if (filters.applicationBefore) {
       result = result.filter(o => {
         const dl = o['Application Deadline'] || o['All Deadlines'] || '';
@@ -240,6 +201,20 @@ function ScholarshipsListing() {
         return year < Number(filters.applicationBefore);
       });
     }
+    if (filters.country) result = result.filter(o => (o['Country'] || '').toLowerCase().includes(filters.country.toLowerCase()));
+    if (filters.scholarshipType) result = result.filter(o => (o['Scholarship Type'] || '').toLowerCase().includes(filters.scholarshipType.toLowerCase()));
+    if (filters.awardAmount) result = result.filter(o => (o['Award Amount'] || '').toLowerCase().includes(filters.awardAmount.toLowerCase()));
+    if (filters.renewable) result = result.filter(o => (o['Renewable'] || '').toLowerCase().includes(filters.renewable.toLowerCase()));
+    if (filters.selectivity) result = result.filter(o => (o['Selectivity'] || '').toLowerCase().includes(filters.selectivity.toLowerCase()));
+    if (filters.awardingOrganization) result = result.filter(o => (o['Awarding Organization'] || '').toLowerCase().includes(filters.awardingOrganization.toLowerCase()));
+    if (filters.geographicAccess) result = result.filter(o => (o['Geographic Access'] || '').toLowerCase().includes(filters.geographicAccess.toLowerCase()));
+    if (filters.residency) result = result.filter(o => (o['Residency'] || '').toLowerCase().includes(filters.residency.toLowerCase()));
+    if (filters.citizenship) result = result.filter(o => (o['Citizenship'] || '').toLowerCase().includes(filters.citizenship.toLowerCase()));
+    if (filters.age) {
+      const sel = Number(filters.age);
+      result = result.filter(o => Array.isArray(o._ageList) && o._ageList.includes(sel));
+    }
+    if (filters.enrollmentRule) result = result.filter(o => (o['Enrollment Rule (School)'] || '').toLowerCase().includes(filters.enrollmentRule.toLowerCase()));
 
     if (searchQuery && searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
@@ -308,7 +283,7 @@ function ScholarshipsListing() {
   const currentOpportunities = filteredOpportunities.slice(startIndex, endIndex);
 
   const uniqueCountries = Array.from(new Set(opportunities.map(o => (o['Country'] || '').trim()).filter(Boolean))).sort();
-  // const uniqueSubjects = Array.from(new Set(opportunities.map(o => ((o['Subject Stream']||o['Subject(s) Details from SOURCE']||'')).trim()).filter(Boolean))).sort();
+  const allowedSubjectStreams = ['Pre-College', 'Mathematics', 'STEM', 'Humanities', 'Commerce', 'Media', 'Miscellaneous', 'Leadership', 'Multidisciplinary'];
   const uniqueSubjects = Array.from(
     new Set(
       opportunities
@@ -317,6 +292,7 @@ function ScholarshipsListing() {
             .split(',')                 // split by comma
             .map(s => s.trim())        // clean spaces
             .filter(Boolean)           // remove empty
+            .filter(s => allowedSubjectStreams.includes(s)) // only allowed categories
         )
     )
   ).sort();
@@ -327,15 +303,14 @@ function ScholarshipsListing() {
   const allAges = opportunities.flatMap(o => (o._ageList || []));
   const uniqueAges = Array.from(new Set(allAges)).sort((a, b) => a - b).map(String);
   const uniqueSelectivity = Array.from(new Set(opportunities.map(o => (o['Selectivity'] || '').trim()).filter(Boolean))).sort();
-  const uniqueHosts = Array.from(new Set(opportunities.map(o => (o['Host Institution / Organizer'] || '').trim()).filter(Boolean))).sort();
+  const uniqueHosts = Array.from(new Set(opportunities.map(o => (o['Awarding Organization'] || '').trim()).filter(Boolean))).sort();
+  const uniqueScholarshipTypes = Array.from(new Set(opportunities.map(o => (o['Scholarship Type'] || '').trim()).filter(Boolean))).sort();
+  const uniqueAwardAmounts = Array.from(new Set(opportunities.map(o => (o['Award Amount'] || '').trim()).filter(Boolean))).sort();
+  const uniqueRenewable = Array.from(new Set(opportunities.map(o => (o['Renewable'] || '').trim()).filter(Boolean))).sort();
   const uniqueEligibility = Array.from(new Set(opportunities.map(o => (o['Eligibility Details from SOURCE'] || o['Eligibility'] || '').trim()).filter(Boolean))).sort();
   const uniqueResidency = Array.from(new Set(opportunities.map(o => (o['Residency'] || '').trim()).filter(Boolean))).sort();
   const uniqueCitizenship = Array.from(new Set(opportunities.map(o => (o['Citizenship'] || '').trim()).filter(Boolean))).sort();
   const uniqueEnrollment = Array.from(new Set(opportunities.map(o => (o['Enrollment Rule (School)'] || '').trim()).filter(Boolean))).sort();
-  const uniqueDurations = Array.from(new Set(opportunities.map(o => ((o['Duration/Timeline'] || o['Duration / Timeline'] || '')).trim()).filter(Boolean))).sort();
-  const uniqueProgramValues = Array.from(new Set(opportunities.map(o => (o['Program Value'] || '').trim()).filter(Boolean))).sort();
-  const uniqueDataYears = Array.from(new Set(opportunities.map(o => (o['Data Year'] || '').trim()).filter(Boolean))).sort();
-  const uniqueCosts = Array.from(new Set(opportunities.map(o => ((o['Cost'] || o['Cost Details'] || '')).trim()).filter(Boolean))).sort();
 
   return (
     <div className="app">
@@ -375,64 +350,64 @@ function ScholarshipsListing() {
           )}
           <br />
           <div className="filters-container scholarships-filters-container">
-            <select value={uiFilters.subject} onChange={(e) => setUiFilters({ ...uiFilters, subject: e.target.value })}>
-              <option value="">All Subjects</option>
+            <h4>Top Priority Filters</h4>
+            <select value={uiFilters.subjectStream} onChange={(e) => setUiFilters({ ...uiFilters, subjectStream: e.target.value })}>
+              <option value="">All Subject Streams</option>
               {uniqueSubjects.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
             <select value={uiFilters.grade} onChange={(e) => setUiFilters({ ...uiFilters, grade: e.target.value })}>
               <option value="">All Grades</option>
               {uniqueGrades.map(g => <option key={g} value={g}>{g}</option>)}
             </select>
+            <input type="number" placeholder="Deadline Before Year" value={uiFilters.applicationBefore} onChange={(e) => setUiFilters({ ...uiFilters, applicationBefore: e.target.value })} />
             <select value={uiFilters.country} onChange={(e) => setUiFilters({ ...uiFilters, country: e.target.value })}>
               <option value="">All Countries</option>
               {uniqueCountries.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
-            <select value={uiFilters.format} onChange={(e) => setUiFilters({ ...uiFilters, format: e.target.value })}>
-              <option value="">All Formats</option>
-              {uniqueFormats.map(f => <option key={f} value={f}>{f}</option>)}
+            <select value={uiFilters.scholarshipType} onChange={(e) => setUiFilters({ ...uiFilters, scholarshipType: e.target.value })}>
+              <option value="">All Scholarship Types</option>
+              {uniqueScholarshipTypes.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+
+            <h4>Second Priority Filters</h4>
+            <select value={uiFilters.awardAmount} onChange={(e) => setUiFilters({ ...uiFilters, awardAmount: e.target.value })}>
+              <option value="">All Award Amounts</option>
+              {uniqueAwardAmounts.map(a => <option key={a} value={a}>{a}</option>)}
+            </select>
+            <select value={uiFilters.renewable} onChange={(e) => setUiFilters({ ...uiFilters, renewable: e.target.value })}>
+              <option value="">All Renewable</option>
+              {uniqueRenewable.map(r => <option key={r} value={r}>{r}</option>)}
             </select>
             <select value={uiFilters.selectivity} onChange={(e) => setUiFilters({ ...uiFilters, selectivity: e.target.value })}>
               <option value="">All Selectivity</option>
-              {uniqueSelectivity.map(s => <option key={s} value={s}>{selectivity_mapping[s]}</option>)}
+              {uniqueSelectivity.map(s => <option key={s} value={s}>{selectivity_mapping[s] || s}</option>)}
+            </select>
+            <select value={uiFilters.awardingOrganization} onChange={(e) => setUiFilters({ ...uiFilters, awardingOrganization: e.target.value })}>
+              <option value="">All Awarding Organizations</option>
+              {uniqueHosts.map(h => <option key={h} value={h}>{h}</option>)}
+            </select>
+
+            <h4>Advanced Filters</h4>
+            <select value={uiFilters.geographicAccess} onChange={(e) => setUiFilters({ ...uiFilters, geographicAccess: e.target.value })}>
+              <option value="">All Geographic Access</option>
+              {Array.from(new Set(opportunities.map(o => (o['Geographic Access'] || '').trim()).filter(Boolean))).sort().map(g => <option key={g} value={g}>{g}</option>)}
+            </select>
+            <select value={uiFilters.residency} onChange={(e) => setUiFilters({ ...uiFilters, residency: e.target.value })}>
+              <option value="">All Residency</option>
+              {uniqueResidency.map(v => <option key={v} value={v}>{v}</option>)}
+            </select>
+            <select value={uiFilters.citizenship} onChange={(e) => setUiFilters({ ...uiFilters, citizenship: e.target.value })}>
+              <option value="">All Citizenship</option>
+              {uniqueCitizenship.map(v => <option key={v} value={v}>{v}</option>)}
             </select>
             <select value={uiFilters.age} onChange={(e) => setUiFilters({ ...uiFilters, age: e.target.value })}>
               <option value="">All Ages</option>
               {uniqueAges.map(a => <option key={a} value={a}>{a}</option>)}
             </select>
-            <select value={uiFilters.host} onChange={(e) => setUiFilters({ ...uiFilters, host: e.target.value })}>
-              <option value="">All Hosts</option>
-              {uniqueHosts.map(h => <option key={h} value={h}>{h}</option>)}
+            <select value={uiFilters.enrollmentRule} onChange={(e) => setUiFilters({ ...uiFilters, enrollmentRule: e.target.value })}>
+              <option value="">All Enrollment Rules</option>
+              {uniqueEnrollment.map(e => <option key={e} value={e}>{e}</option>)}
             </select>
-
-
-
-
-            <select value={uiFilters.residency} onChange={(e) => setUiFilters({ ...uiFilters, residency: e.target.value })}>
-              <option value="">All Residency</option>
-              {uniqueResidency.map(v => <option key={v} value={v}>{v}</option>)}
-            </select>
-
-            <select value={uiFilters.citizenship} onChange={(e) => setUiFilters({ ...uiFilters, citizenship: e.target.value })}>
-              <option value="">All Citizenship</option>
-              {uniqueCitizenship.map(v => <option key={v} value={v}>{v}</option>)}
-            </select>
-
-
-
-            <select value={uiFilters.dataYear} onChange={(e) => setUiFilters({ ...uiFilters, dataYear: e.target.value })}>
-              <option value="">Data Years</option>
-              {uniqueDataYears.map(v => <option key={v} value={v}>{v}</option>)}
-            </select>
-
-            <select value={uiFilters.cost} onChange={(e) => setUiFilters({ ...uiFilters, cost: e.target.value })}>
-              <option value="">All Costs</option>
-              {uniqueCosts.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-
-
-
-
-
           </div>
         </div>
 
@@ -447,7 +422,7 @@ function ScholarshipsListing() {
               <>
                 <div className="opportunities-grid">
                   {currentOpportunities.map((opportunity, index) => (
-                    <OpportunityCardInternship key={opportunity.id} opportunity={opportunity} index={startIndex + index} />
+                    <ScholarshipTableCard key={opportunity.id} opportunity={opportunity} index={startIndex + index} />
                   ))}
                 </div>
                 {totalPages > 1 && (<Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={(p) => { setCurrentPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }) }} />)}

@@ -35,10 +35,19 @@ const Navbar = () => {
                         {programsopen && (
                             <div className="dropdown-content">
                                 <Link to="/summer_programs" onClick={() => setprogramsopen(false)}>
-                                    <i className="fa-solid fa-info"></i> Summer programs
+                                    <i class="fa-solid fa-award"></i> Summer programs
                                 </Link>
                                 <Link to="/competitions" onClick={() => setprogramsopen(false)}>
-                                    <i className="fa-solid fa-chart-line"></i> Competitions
+                                    <i class="fa-solid fa-trophy"></i> Competitions
+                                </Link>
+                                <Link to="/internships" onClick={() => setprogramsopen(false)}>
+                                    <i class="fa-solid fa-briefcase"></i> Internships
+                                </Link>
+                                <Link to="/scholarships" onClick={() => setprogramsopen(false)}>
+                                    <i class="fa-brands fa-google-scholar"></i> Scholarships
+                                </Link>
+                                <Link to="/courses" onClick={() => setprogramsopen(false)}>
+                                    <i class="fa-solid fa-award"></i> Courses
                                 </Link>
 
                             </div>

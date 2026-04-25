@@ -1,6 +1,6 @@
 .internships-sidebar{
-    flex: 1;
-    width: 400px;
+    /* flex: 1; */
+    width: 360px;
     height: 80vh;
     position: sticky;
     top:120px;
@@ -9,6 +9,9 @@
     box-shadow: 0 0 20px purple;
     overflow-y: scroll;
 
+}
+select{
+  max-width: 300px;
 }
 .internships-content-container{
     flex: 3;
@@ -34,12 +37,12 @@
   font-weight: 600;
   padding: 8px 10px;
   width: 20%;
-  color: #ffeb3b;
+  color: #3b45ff;
 }
 
 .kv-table td {
   padding: 8px 10px;
-  color: #ffffff;
+  color: #000000;
 }
 
 /* subtle row separation */
