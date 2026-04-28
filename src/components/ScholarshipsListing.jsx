@@ -133,6 +133,7 @@ function ScholarshipsListing() {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [filters, setFilters] = useState({
     subjectStream: '',
@@ -225,16 +226,14 @@ function ScholarshipsListing() {
     setCurrentPage(1);
   }, [searchQuery, filters, opportunities]);
 
-  // Apply UI filters when user clicks Apply
-  const applyUiFilters = () => {
+  // Auto-apply filters whenever UI filters change
+  useEffect(() => {
     setFilters({ ...uiFilters });
-    toast("Filters Applied");
-  };
+  }, [uiFilters]);
 
   const clearUiFilters = () => {
     const empty = Object.keys(uiFilters).reduce((acc, k) => ({ ...acc, [k]: '' }), {});
     setUiFilters(empty);
-    setFilters(empty);
     toast("Filters Cleared");
   };
 
@@ -317,17 +316,31 @@ function ScholarshipsListing() {
       <header className="app-header">
         <div className="container">
           <div className="header-content">
-            <div>
+            <div style={{flex:2}}>
               <p className="app-subtitle">Scholarships</p>
+              {opportunities.length > 0 && (
+            <div className="file-info"><span className="file-count">
+              {filteredOpportunities.length === opportunities.length
+                ? `Showing ${opportunities.length} scholarships`
+                : `Showing ${filteredOpportunities.length} of ${opportunities.length} scholarships`
+              }
+            </span></div>
+          )}
             </div>
-            <div className="upload-buttons">
-              <button type="button" className="reload-button" onClick={handleReloadOriginal} disabled={loading}><i class="fa-solid fa-arrow-rotate-right"></i> Reload Scholarships</button>
+            <div  style={{flex:4,maxHeight:'100%'}}>
+              {opportunities.length > 0 && (<SearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />)}
+            </div>
+            <div style={{flex:1}} className="upload-buttons">
+              <button type="button" className="reload-button" onClick={handleReloadOriginal} disabled={loading}><i class="fa-solid fa-arrow-rotate-right"></i></button>
             </div>
           </div>
         </div>
       </header>
       <div className='scholarships-body-container'>
-        <div className="scholarships-sidebar">
+        <div className="sidebar-toggle">
+          <i onClick={()=>setSidebarOpen(!sidebarOpen)} style={{cursor:'pointer'}} class="fa-solid fa-bars"></i>
+        </div>
+        <div className={`scholarships-sidebar ${sidebarOpen?"":"sidebar-closed"}`}>
           <div className="upload-section">
 
           </div>
@@ -336,7 +349,6 @@ function ScholarshipsListing() {
 
             {opportunities.length > 0 && (<SearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />)}
             <div style={{ display: 'flex', gap: 8 }}>
-              <button className="navbar-btn" style={{ backgroundColor: '#24c542' }} onClick={applyUiFilters}><i class="fa-solid fa-filter"></i> Apply Filters</button>
               <button className="navbar-btn" style={{ backgroundColor: '#c56224' }} onClick={clearUiFilters}><i class="fa-solid fa-times"></i> Clear Filters</button>
             </div>
           </div>

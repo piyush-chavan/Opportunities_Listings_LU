@@ -118,6 +118,23 @@ const normalizeDeadline = (s) => {
   if (m) return m[1];
   return raw;
 };
+function excelDateToJSDate(serial) {
+  const utc_days = Math.floor(serial - 25569);
+  const utc_value = utc_days * 86400; // seconds
+  const date_info = new Date(utc_value * 1000);
+
+  return date_info;
+}
+function getDeadlineStatus(date) {
+  const today = new Date();
+  const diffTime = date - today;
+  const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+  if (diffDays < 0) return "passed";
+  if (diffDays <= 15) return "urgent";
+  return "normal";
+}
+
 const selectivity_mapping = {
   "Highly Selective": "Highly Recommended",
   "Selective": "Recommended",
@@ -133,6 +150,7 @@ function SummerProgramsListing() {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
+  const [sidebarOpen,setSidebarOpen] = useState(false)
 
   const [filters, setFilters] = useState({
     luRating: '',
@@ -250,16 +268,14 @@ function SummerProgramsListing() {
     setCurrentPage(1);
   }, [searchQuery, filters, opportunities]);
 
-  // Apply UI filters when user clicks Apply
-  const applyUiFilters = () => {
+  // Auto-apply filters whenever UI filters change
+  useEffect(() => {
     setFilters({ ...uiFilters });
-    toast("Filters Applied");
-  };
+  }, [uiFilters]);
 
   const clearUiFilters = () => {
     const empty = Object.keys(uiFilters).reduce((acc, k) => ({ ...acc, [k]: '' }), {});
     setUiFilters(empty);
-    setFilters(empty);
     toast("Filters Cleared");
   };
 
@@ -278,8 +294,8 @@ function SummerProgramsListing() {
           copy._gradeList = parseGradeString(copy['Grade'] || '');
         } catch (e) { copy._gradeList = []; }
         // Normalize deadlines
-        const rawDl = copy['Application Deadline'] || copy['All Deadlines'] || '';
-        // copy['Application Deadline'] = normalizeDeadline(rawDl);
+        const rawDl = copy['Application Deadline'] || '';
+        copy['Application Deadline'] = excelDateToJSDate(rawDl);
         // copy['All Deadlines'] = normalizeDeadline(copy['All Deadlines'] || '');
         return copy;
       });
@@ -342,39 +358,42 @@ function SummerProgramsListing() {
       <header className="app-header">
         <div className="container">
           <div className="header-content">
-            <div>
+            <div style={{flex:2}}>
               <p className="app-subtitle">Summer Programs</p>
+              {opportunities.length > 0 && (
+            <div className="file-info"><span className="file-count">
+              {filteredOpportunities.length === opportunities.length
+                ? `Showing ${opportunities.length} summer programs`
+                : `Showing ${filteredOpportunities.length} of ${opportunities.length} summer programs`
+              }
+            </span></div>
+          )}
             </div>
-            <div className="upload-buttons">
-              <button type="button" className="reload-button" onClick={handleReloadOriginal} disabled={loading}><i class="fa-solid fa-arrow-rotate-right"></i> Reload Summer Programs</button>
+            <div  style={{flex:4,maxHeight:'100%'}}>
+              {opportunities.length > 0 && (<SearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />)}
+            </div>
+            <div style={{flex:1}} className="upload-buttons">
+              <button type="button" className="reload-button" onClick={handleReloadOriginal} disabled={loading}><i class="fa-solid fa-arrow-rotate-right"></i></button>
             </div>
           </div>
         </div>
       </header>
       <div className='summer-programs-body-container'>
-        <div className="summer-programs-sidebar">
-          <div className="upload-section">
-
-          </div>
-
-          <div style={{ position: 'sticky', top: 0, borderRadius: '20px', backgroundColor: '#ffffff7d', backdropFilter: 'blur(10px)', padding: '20px 10px' }}>
-
-            {opportunities.length > 0 && (<SearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />)}
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button className="navbar-btn" style={{ backgroundColor: '#24c542' }} onClick={applyUiFilters}><i class="fa-solid fa-filter"></i> Apply Filters</button>
-              <button className="navbar-btn" style={{ backgroundColor: '#c56224' }} onClick={clearUiFilters}><i class="fa-solid fa-times"></i> Clear Filters</button>
-            </div>
-          </div>
+        <div className="sidebar-toggle">
+          <i onClick={()=>setSidebarOpen(!sidebarOpen)} style={{cursor:'pointer'}} class="fa-solid fa-bars"></i>
+        </div>
+        <div className={`summer-programs-sidebar ${sidebarOpen?"":"sidebar-closed"}`}>
+          
           {opportunities.length > 0 && (
             <div className="file-info"><span className="file-count">
               {filteredOpportunities.length === opportunities.length
-                ? `${opportunities.length} summer programs loaded`
+                ? `Showing ${opportunities.length} summer programs`
                 : `Showing ${filteredOpportunities.length} of ${opportunities.length} summer programs`
               }
             </span></div>
           )}
-          <br />
           <div className="filters-container summer-programs-filters-container">
+            <span style={{ cursor: 'pointer' }} onClick={clearUiFilters}><i class="fa-solid fa-times"></i> Clear Filters</span>
             <select value={uiFilters.subject} onChange={(e) => setUiFilters({ ...uiFilters, subject: e.target.value })}>
               <option value="">All Subjects</option>
               {uniqueSubjects.map(s => <option key={s} value={s}>{s}</option>)}
@@ -403,7 +422,7 @@ function SummerProgramsListing() {
               {uniqueAges.map(a => <option key={a} value={a}>{a}</option>)}
             </select>
             <details>
-              <summary>More Filters</summary>
+              <summary style={{ cursor: 'pointer' }}>More Filters</summary>
               <select value={uiFilters.host} onChange={(e) => setUiFilters({ ...uiFilters, host: e.target.value })}>
                 <option value="">All Hosts</option>
                 {uniqueHosts.map(h => <option key={h} value={h}>{h}</option>)}

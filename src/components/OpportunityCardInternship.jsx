@@ -7,6 +7,12 @@ const selectivity_mapping = {
     "General": "Can be considered",
     "Open": "Not Recommended"
 }
+function truncateText(text, maxLength) {
+  if (!text) return "";
+  return text.length > maxLength
+    ? text.slice(0, maxLength) + "..."
+    : text;
+}
 const OpportunityCardInternship = ({ opportunity, index }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const description = opportunity['Subject(s) Details from SOURCE'] || opportunity['Summary'] || opportunity['Note'] || '';
@@ -18,36 +24,36 @@ const OpportunityCardInternship = ({ opportunity, index }) => {
                 <div className="card-tag">#{index + 1}</div>
 
                 {opportunity['Program Name'] && <p className="card-program-title">{opportunity['Program Name']}</p>}
-                {opportunity['Host Institution / Organizer'] && <p className='card-entity-name'>{opportunity['Host Institution / Organizer']}</p>}
+                {opportunity['Host Institution / Organizer'] && <p className='card-entity-name'>{truncateText(opportunity['Host Institution / Organizer'], 30)}</p>}
 
                 <hr />
-                <br />
-
-                <div class="kv-container">
-                    <table class="kv-table">
+                
+                {/* {opportunity['Program Value'] && <div className="card-tag">{opportunity['Program Value']}</div>} */}
+                            {opportunity['Format'] && <div className="card-tag">{opportunity['Format']}</div>}
+                            {opportunity['Country'] && <div className="card-tag">{opportunity['Country']}</div>}
+                            {opportunity['Citizenship'] && <div className="card-tag">{opportunity['Citizenship']}</div>}
+                            {opportunity['Residency'] && <div className="card-tag">{opportunity['Residency']}</div>}
+                <div class="kv-summer-container">
+                    <table class="kv-summer-table">
                         <tbody>
-                            <tr>
+                            {/* <tr>
                                 <th>Subject</th>
                                 <td>{opportunity['Subject']}</td>
-                            </tr>
+                            </tr> */}
                             <tr>
-                                <th>Subject Stream</th>
+                                <th><i class="fa-solid fa-book"></i></th>
                                 <td>{opportunity['Subject Stream']}</td>
                             </tr>
                             <tr>
-                                <th>Application Deadline</th>
-                                <td>{opportunity['Application Deadline'] || opportunity['All Deadlines']}</td>
+                                <th><i class="fa-solid fa-calendar"></i></th>
+                                <td>{opportunity['Application Deadline'] ? opportunity['Application Deadline'].toDateString() : "NA"}</td>
                             </tr>
                             <tr>
-                                <th>Cost</th>
+                                <th><i class="fa-solid fa-indian-rupee-sign"></i></th>
                                 <td>{opportunity['Cost']}</td>
                             </tr>
                             <tr>
-                                <th>Cost Details</th>
-                                <td>{opportunity['Cost Details']}</td>
-                            </tr>
-                            <tr>
-                                <th>Selectivity</th>
+                                <th><i class="fa-solid fa-calendar-check"></i></th>
                                 <td>{selectivity_mapping[opportunity['Selectivity']]}</td>
                             </tr>
                         </tbody>
@@ -60,24 +66,16 @@ const OpportunityCardInternship = ({ opportunity, index }) => {
                 {opportunity['Cost'] && <p className="card-text"><b>Cost:</b> {opportunity['Cost']}</p>}
                 {opportunity['Cost Details'] && <p className="card-text"><b>Cost Details:</b> {opportunity['Cost Details']}</p>}
                 {opportunity['Selectivity'] && <p className="card-text"><b>Selectivity:</b> {selectivity_mapping[opportunity['Selectivity']]}</p>} */}
-                {opportunity['Official Link'] && (
-                    <a target="_blank" rel="noreferrer" href={opportunity['Official Link']} className='card-text mui-button'>
-                        <b>Official Link</b>
-                    </a>
-                )}
+                
                 <br />
                 <details>
-                    <summary style={{ cursor: 'pointer', color: '#cddc39' }}>
+                    <summary style={{ cursor: 'pointer', color: '#3951dc',fontSize:'12px' }}>
                         Detailed View
                     </summary>
                     <div>
                         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                             {opportunity['Duration/Timeline'] && <div className="card-tag">{opportunity['Duration/Timeline']}</div>}
-                            {opportunity['Program Value'] && <div className="card-tag">{opportunity['Program Value']}</div>}
-                            {opportunity['Format'] && <div className="card-tag">{opportunity['Format']}</div>}
-                            {opportunity['Country'] && <div className="card-tag">{opportunity['Country']}</div>}
-                            {opportunity['Citizenship'] && <div className="card-tag">{opportunity['Citizenship']}</div>}
-                            {opportunity['Residency'] && <div className="card-tag">{opportunity['Residency']}</div>}
+                            
                             {opportunity['Enrollment Rule (School)'] && <div className="card-tag">{opportunity['Enrollment Rule (School)']}</div>}
                             {opportunity['Geographic Access'] && <div className="card-tag">{opportunity['Geographic Access']}</div>}
                             {opportunity['Cost'] && <div className="card-tag">{opportunity['Cost']}</div>}
@@ -89,7 +87,7 @@ const OpportunityCardInternship = ({ opportunity, index }) => {
 
                         {opportunity['Age'] && <p className="card-text"><b>Age:</b> {opportunity['Age']}</p>}
                         {opportunity['Grade'] && <p className="card-text"><b>Grade:</b> {opportunity['Grade']}</p>}
-
+                        {opportunity['Cost Details'] && <p className="card-text"><b>Cost Details:</b> {opportunity['Cost Details']}</p>}
 
                         {description && (
                             <p className="card-text">
@@ -108,7 +106,11 @@ const OpportunityCardInternship = ({ opportunity, index }) => {
                         {opportunity['Notes'] && <p className="card-text"><b>Notes:</b> {opportunity['Notes']}</p>}
                         {/* {opportunity['Source'] && <p className="card-text"><b>Source:</b> {opportunity['Source']}</p>} */}
                         {opportunity['Tagging'] && <p className="card-text"><b>Tags:</b> {opportunity['Tagging']}</p>}
-
+                        {opportunity['Official Link'] && (
+                    <a target="_blank" rel="noreferrer" href={opportunity['Official Link']} className='card-text mui-button'>
+                        <b>Official Link</b>
+                    </a>
+                )}
                     </div>
                 </details>
             </div>

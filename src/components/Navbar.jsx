@@ -88,7 +88,7 @@ const Navbar = () => {
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <button className="sign-out-button" onClick={handleSignOut}>Sign Out</button>
+                    <i onClick={handleSignOut} style={{cursor:'pointer'}} class="fa-solid fa-right-from-bracket"></i>
                 </div>
             </div>
         </nav>

@@ -1,15 +1,33 @@
 .internships-sidebar{
-    /* flex: 1; */
     width: 360px;
     height: 80vh;
-    position: sticky;
-    top:120px;
+    position: fixed;
+    top: 130px;
+    left: 0;
     padding: 30px;
-    padding-top: 0;
+    padding-top: 20px;
     box-shadow: 0 0 20px purple;
     overflow-y: scroll;
-
+    transform: translateX(0);
+    transition: transform 0.3s ease;
+    background-color: #3bff8d5e;
+    backdrop-filter: blur(10px);
 }
+
+.sidebar-closed {
+  transform: translateX(-100%);
+}
+
+.sidebar-toggle {
+  position: fixed;
+  z-index: 100;
+  top: 90px;
+  left: 40px;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+}
+
 select{
   max-width: 300px;
 }

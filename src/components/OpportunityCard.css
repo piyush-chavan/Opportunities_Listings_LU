@@ -2,15 +2,17 @@
   background: var(--bg-card);
   border-radius: 12px;
   box-shadow: var(--shadow-sm);
-  padding: 24px;
+  padding: 16px;
   transition: all 0.3s ease;
   border: 1px solid var(--border-color);
   display: flex;
   flex-direction: row;
   gap: 24px;
   align-items: flex-start;
-  max-width: 32%;
-  overflow-wrap: break-word;
+  max-width: 340px;
+  min-height: 300px;
+  overflow-wrap: anywhere;
+  line-height: 1.3;
 }
 
 .opportunity-card:hover {
@@ -30,12 +32,11 @@
   display: inline-block;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  padding: 4px 10px;
+  padding: 2px 8px;
   border-radius: 16px;
-  margin-bottom: 10px;
-  margin-right: 10px;
+  margin: 1px 2px;
 }
 
 .card-text{
@@ -166,13 +167,14 @@
   }
 }
 .card-program-title{
-  font-size: 24px;
+  font-size: 16px;
   font-family: "Poppins", sans-serif;
   font-weight: 700;
   font-style: normal;
+  line-height: 1.3;
 }
 .card-entity-name{
-  font-size: 18px;
+  font-size: 14px;
   font-family: "Poppins", sans-serif;
   font-weight: 400;
   font-style: normal;

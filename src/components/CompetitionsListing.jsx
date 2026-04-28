@@ -147,6 +147,7 @@ function CompetitionsListing() {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [filters, setFilters] = useState({
     luRating: '',
@@ -288,16 +289,14 @@ function CompetitionsListing() {
     setCurrentPage(1);
   }, [searchQuery, filters, opportunities]);
 
-  // Apply UI filters when user clicks Apply
-  const applyUiFilters = () => {
+  // Auto-apply filters whenever UI filters change
+  useEffect(() => {
     setFilters({ ...uiFilters });
-    toast("Filters Applied");
-  };
+  }, [uiFilters]);
 
   const clearUiFilters = () => {
     const empty = Object.keys(uiFilters).reduce((acc, k) => ({ ...acc, [k]: '' }), {});
     setUiFilters(empty);
-    setFilters(empty);
     toast("Filters Cleared");
   };
 
@@ -392,26 +391,36 @@ function CompetitionsListing() {
       <header className="app-header">
         <div className="container">
           <div className="header-content">
-            <div>
+            <div style={{flex:2}}>
               <p className="app-subtitle">Competitions</p>
+              {opportunities.length > 0 && (
+            <div className="file-info"><span className="file-count">
+              {filteredOpportunities.length === opportunities.length
+                ? `Showing ${opportunities.length} competitions`
+                : `Showing ${filteredOpportunities.length} of ${opportunities.length} competitions`
+              }
+            </span></div>
+          )}
             </div>
-            <div className="upload-buttons">
-              <button type="button" className="reload-button" onClick={handleReloadOriginal} disabled={loading}><i className="fa-solid fa-arrow-rotate-right"></i> Reload Competitions</button>
+            <div  style={{flex:4,maxHeight:'100%'}}>
+              {opportunities.length > 0 && (<SearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />)}
+            </div>
+            <div style={{flex:1}} className="upload-buttons">
+              <button type="button" className="reload-button" onClick={handleReloadOriginal} disabled={loading}><i className="fa-solid fa-arrow-rotate-right"></i></button>
             </div>
           </div>
         </div>
       </header>
       <div className='competitions-body-container'>
-        <div className="competitions-sidebar">
-          <div className="upload-section">
-
-          </div>
+        <div className="sidebar-toggle">
+          <i onClick={()=>setSidebarOpen(!sidebarOpen)} style={{cursor:'pointer'}} className="fa-solid fa-bars"></i>
+        </div>
+        <div className={`competitions-sidebar ${sidebarOpen?"":"sidebar-closed"}`}>
 
           <div style={{ position: 'sticky', top: 0, borderRadius: '20px', backgroundColor: '#ffffff3c', backdropFilter: 'blur(10px)', padding: '20px 10px' }}>
 
             {opportunities.length > 0 && (<SearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />)}
             <div style={{ display: 'flex', gap: 8 }}>
-              <button className="navbar-btn" style={{ backgroundColor: '#24c542' }} onClick={applyUiFilters}><i className="fa-solid fa-filter"></i> Apply Filters</button>
               <button className="navbar-btn" style={{ backgroundColor: '#c56224' }} onClick={clearUiFilters}><i className="fa-solid fa-times"></i> Clear Filters</button>
             </div>
           {opportunities.length > 0 && (

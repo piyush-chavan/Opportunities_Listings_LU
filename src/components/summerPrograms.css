@@ -1,35 +1,59 @@
-.summer-programs-sidebar{
-    /* flex: 1; */
-    width: 360px;
-    height: 80vh;
-    position: sticky;
-    top:120px;
-    padding: 30px;
-    padding-top: 0;
-    box-shadow: 0 0 20px purple;
-    overflow-y: scroll;
+.summer-programs-sidebar {
+  /* flex: 1; */
+  width: 360px;
+  height: 80vh;
+  position: fixed;
+  top: 130px;
+  padding: 30px;
+  padding-top: 20px;
+  box-shadow: 0 0 20px purple;
+  overflow-y: scroll;
+  transform: translateX(0);
+  transition: transform 0.3s ease;
+  background-color: #3bff8d5e;
+  backdrop-filter: blur(10px);
+
 
 }
-.summer-programs-content-container{
-    flex: 3;
-    padding: 20px;
+
+.sidebar-closed {
+  transform: translateX(-100%);
+}
+
+.sidebar-toggle {
+  position: fixed;
+  z-index: 100;
+  top: 90px;
+  left: 40px;
+  color: white;
 
 }
-.summer-programs-body-container{
-    display: flex;
+
+.summer-programs-content-container {
+  display: flex;
+  padding: 20px;
+  justify-content: center;
+  align-items: center;
+
 }
-.kv-container {
+
+.summer-programs-body-container {
+  display: flex;
+}
+
+.kv-summer-container {
   /* max-width: 500px; */
   margin: 10px 0;
   font-family: system-ui, sans-serif;
 }
 
-.kv-table {
+.kv-summer-table {
+  font-size: 12px;
   width: 100%;
   border-collapse: collapse;
 }
 
-.kv-table th {
+.kv-summer-table th {
   text-align: left;
   font-weight: 600;
   padding: 0 10px;
@@ -37,12 +61,12 @@
   color: #763bff;
 }
 
-.kv-table td {
+.kv-summer-table td {
   padding: 0 10px;
   color: #000000;
 }
 
 /* subtle row separation */
-.kv-table tr:not(:last-child) {
+.kv-summer-table tr:not(:last-child) {
   border-bottom: 1px solid #eee;
 }

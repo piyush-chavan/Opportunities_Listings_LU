@@ -145,6 +145,7 @@ function InternshipsListing() {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [filters, setFilters] = useState({
     luRating: '',
@@ -323,16 +324,14 @@ function InternshipsListing() {
     setCurrentPage(1);
   }, [searchQuery, filters, opportunities]);
 
-  // Apply UI filters when user clicks Apply
-  const applyUiFilters = () => {
+  // Auto-apply filters whenever UI filters change
+  useEffect(() => {
     setFilters({ ...uiFilters });
-    toast("Filters Applied");
-  };
+  }, [uiFilters]);
 
   const clearUiFilters = () => {
     const empty = Object.keys(uiFilters).reduce((acc, k) => ({ ...acc, [k]: '' }), {});
     setUiFilters(empty);
-    setFilters(empty);
     toast("Filters Cleared");
   };
 
@@ -420,39 +419,42 @@ function InternshipsListing() {
       <header className="app-header">
         <div className="container">
           <div className="header-content">
-            <div>
+            <div style={{flex:2}}>
               <p className="app-subtitle">Internships</p>
+              {opportunities.length > 0 && (
+            <div className="file-info"><span className="file-count">
+              {filteredOpportunities.length === opportunities.length
+                ? `Showing ${opportunities.length} internships`
+                : `Showing ${filteredOpportunities.length} of ${opportunities.length} internships`
+              }
+            </span></div>
+          )}
             </div>
-            <div className="upload-buttons">
-              <button type="button" className="reload-button" onClick={handleReloadOriginal} disabled={loading}><i class="fa-solid fa-arrow-rotate-right"></i> Reload Internships</button>
+            <div  style={{flex:4,maxHeight:'100%'}}>
+              {opportunities.length > 0 && (<SearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />)}
+            </div>
+            <div style={{flex:1}} className="upload-buttons">
+              <button type="button" className="reload-button" onClick={handleReloadOriginal} disabled={loading}><i class="fa-solid fa-arrow-rotate-right"></i></button>
             </div>
           </div>
         </div>
       </header>
       <div className='internships-body-container'>
-        <div className="internships-sidebar">
-          <div className="upload-section">
-
-          </div>
-
-          <div style={{ position: 'sticky', top: 0, borderRadius: '20px', backgroundColor: '#ececec7d', backdropFilter: 'blur(10px)', padding: '20px 10px' }}>
-
-            {opportunities.length > 0 && (<SearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />)}
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button className="navbar-btn" style={{ backgroundColor: '#24c542' }} onClick={applyUiFilters}><i class="fa-solid fa-filter"></i> Apply Filters</button>
-              <button className="navbar-btn" style={{ backgroundColor: '#c56224' }} onClick={clearUiFilters}><i class="fa-solid fa-times"></i> Clear Filters</button>
-            </div>
-          </div>
+        <div className="sidebar-toggle">
+          <i onClick={()=>setSidebarOpen(!sidebarOpen)} style={{cursor:'pointer'}} class="fa-solid fa-bars"></i>
+        </div>
+        <div className={`internships-sidebar ${sidebarOpen?"":"sidebar-closed"}`}>
+          
           {opportunities.length > 0 && (
             <div className="file-info"><span className="file-count">
               {filteredOpportunities.length === opportunities.length
-                ? `${opportunities.length} internships loaded`
+                ? `Showing ${opportunities.length} internships`
                 : `Showing ${filteredOpportunities.length} of ${opportunities.length} internships`
               }
             </span></div>
           )}
-          <br />
           <div className="filters-container internships-filters-container">
+            <span style={{ cursor: 'pointer' }} onClick={clearUiFilters}><i class="fa-solid fa-times"></i> Clear Filters</span>
             <select value={uiFilters.subjectStream} onChange={(e) => setUiFilters({ ...uiFilters, subjectStream: e.target.value })}>
               <option value="">All Subject Streams</option>
               {TOP_LEVEL_SUBJECT_STREAMS.map(s => <option key={s} value={s}>{s}</option>)}
