@@ -2,7 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Poppins, sans-serif;
+  font-family: "Sora", sans-serif;;
 }
 
 :root {
@@ -16,6 +16,38 @@
   --bg-hover: #f3f4f6;
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
+  /* suggestted colors in database changes doc LU */
+  --bg: #F5F4F0;                   /* warm off-white page background */
+  --surface: #FFFFFF;              /* card and sidebar background */
+--surface-hover: #FAFAF8;        /* card hover background */
+--border: #E2E0D9;              /* all borders */
+--border-hover: #C5C2BA;        /* border on hover */
+--text-primary: #18181B ;       /* headings, card titles */
+--text-secondary: #6B6860;      /* body text, filter labels */
+--text-muted: #9B9890 ;         /* helper text, meta labels, rank numbers */
+--accent: #1A3A5C;              /* header bg, primary buttons, active states */
+--accent-mid: #2E5F8A ;         /* button hover, focus rings, code text */
+--accent-light: #EBF0F5 ;       /* active filter chip bg, detail badge bg */
+--tag-bg: #EEECEA  ;            /* default chip/tag background */
+--tag-text: #3D3B35;            /* default chip/tag text */
+--tag-free-bg: #EDFAF3 ;        /* Free tag bg */
+--tag-free-text: #166534 ;      /* Free tag text */
+--tag-online-bg: #EEF2FF;       /* Online / Global Eligible tag bg */
+--tag-online-text: #3730A3 ;    /* Online / Global Eligible tag text */
+--tag-selective-bg: #FFF7ED;    /* Highly Selective tag bg */
+--tag-selective-text: #9A3412;  /* Highly Selective tag text */
+--tag-global-bg: #F0FDF4 ;      /* Global tag bg */
+--tag-global-text: #14532D;     /* Global tag text */
+--deadline-soon: #B45309;       /* deadline within 30 days */
+--deadline-past: #DC2626;       /* deadline already passed */
+--cost-free: #166534 ;          /* "Free" cost value in card right column */
+--fs-xs: 10px;
+--fs-sm: 11px;
+--fs-tag: 11px;
+--fs-body: 12.5px;
+--fs-label: 13px;
+--fs-card-title: 14px;
+--fs-section: 14px; 
 }
 
 
@@ -26,7 +58,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--bg-light);
+  background-color: var(--bg);
   color: var(--text-primary);
   line-height: 1.6;
 }
@@ -46,7 +78,7 @@ body {
 
 /* Header / Navbar */
 .app-header {
-  background: var(--primary-gradient);
+  background: var(--accent);
   color: white;
   padding: 10px 0;
   box-shadow: var(--shadow-md);
