@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { signInWithPopup, onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase';
 import '../styles/SignInPage.css';
+import HomePageSkeleton from './Skeleton/HomePageSkeleton';
 
 const isAllowedLetUnboundEmail = (email) => {
   return typeof email === 'string' && email.toLowerCase().endsWith('@letsunbound.com');
@@ -46,10 +47,7 @@ export default function SignInPage() {
 
   if (loading) {
     return (
-      <div className="loading-container">
-        <div className="spinner"></div>
-        <p>Loading...</p>
-      </div>
+      <HomePageSkeleton/>
     );
   }
 

@@ -7,6 +7,18 @@ const selectivity_mapping = {
     "General": "Can be considered",
     "Open": "Not Recommended"
 };
+function excelDateToJSDate(serial) {
+    try {
+        const utc_days = Math.floor(serial - 25569);
+        const utc_value = utc_days * 86400; // seconds
+        const date_info = new Date(utc_value * 1000);
+        return date_info.toDateString();
+    }
+    catch (err) {
+        return "N/A"
+    }
+    return "N/A"
+}
 
 const InternshipTableCard = ({ opportunity, index }) => {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -35,69 +47,76 @@ const InternshipTableCard = ({ opportunity, index }) => {
             <div className="card-content">
                 <div className="card-tag">#{index + 1}</div>
 
-                {opportunity['Program Name'] && <p className="card-program-title">{opportunity['Program Name']}</p>}
-                {opportunity['Host Institution / Organizer'] && <p className='card-entity-name'>{opportunity['Host Institution / Organizer']}</p>}
+                {opportunity['Internship Name'] && <p className="card-program-title">{opportunity['Internship Name']}</p>}
+                {opportunity['Organizing Body / Host Institution'] && <p className='card-entity-name'>{opportunity['Organizing Body / Host Institution']}</p>}
 
                 <hr />
-                <br />
+                {opportunity['Format'] && <div className="card-tag tag-default">{opportunity['Format']}</div>}
+                {opportunity['Prestige / Selectivity'] && <div className="card-tag tag-default">{opportunity['Prestige / Selectivity']}</div>}
+                {opportunity['Cost'] && <div className="card-tag tag-default">{opportunity['Cost']}</div>}
+                {/* {opportunity['Format'] && <div className="card-tag tag-default">{opportunity['Format']}</div>} */}
 
                 <div className="kv-container">
                     <table className="kv-table">
                         <tbody>
-                            <tr>
+                            {/* <tr>
                                 <th>Internship Name</th>
                                 <td>{opportunity['Internship Name'] || opportunity['Program Name']}</td>
                             </tr>
                             <tr>
                                 <th>Organizing Body / Host Institution</th>
                                 <td>{opportunity['Organizing Body / Host Institution'] || opportunity['Host Institution / Organizer']}</td>
-                            </tr>
+                            </tr> */}
                             <tr>
-                                <th>Subject Stream</th>
+                                <th><i class="fa-solid fa-book"></i></th>
                                 <td>{opportunity['Subject Stream']}</td>
                             </tr>
                             <tr>
-                                <th>Grade</th>
+                                <th><i class="fa-solid fa-user-graduate"></i></th>
                                 <td>{opportunity['Grade']}</td>
                             </tr>
-                            <tr>
+                            {/* <tr>
                                 <th>Format</th>
                                 <td>{opportunity['Format']}</td>
-                            </tr>
-                            <tr>
+                            </tr> */}
+                            {/* <tr>
                                 <th>Duration / Timeline</th>
                                 <td>{opportunity['Duration / Timeline'] || opportunity['Duration / Structure']}</td>
-                            </tr>
+                            </tr> */}
                             <tr>
-                                <th>Application / Registration Deadline</th>
-                                <td>{opportunity['Application / Registration Deadline'] || opportunity['All Deadlines']}</td>
+                                <th><i class="fa-solid fa-calendar"></i></th>
+                                <td>{excelDateToJSDate(opportunity['Application / Registration Deadline']) || ""}</td>
                             </tr>
-                            <tr>
+                            {/* <tr>
                                 <th>Cost</th>
                                 <td>{opportunity['Cost']}</td>
-                            </tr>
-                            <tr>
+                            </tr> */}
+                            {/* <tr>
                                 <th>Compensation & Benefits</th>
                                 <td>{opportunity['Compensation & Benefits'] || opportunity['Stipend / Compensation']}</td>
-                            </tr>
-                            <tr>
+                            </tr> */}
+                            {/* <tr>
                                 <th>Prestige / Selectivity</th>
                                 <td>{selectivity_mapping[opportunity['Prestige / Selectivity']] || opportunity['Prestige / Selectivity']}</td>
-                            </tr>
-                            <tr>
+                            </tr> */}
+                            {/* <tr>
                                 <th>Official Link</th>
                                 <td>{opportunity['Official Link'] ? <a target="_blank" rel="noreferrer" href={opportunity['Official Link']}>Visit</a> : 'N/A'}</td>
-                            </tr>
+                            </tr> */}
                         </tbody>
                     </table>
                 </div>
 
-                <details className="card-details">
-                    <summary>View All Details</summary>
+                <details className="card-details" style={{fontSize:'12px'}}>
+                    <summary style={{ cursor: 'pointer', color: '#3951dc', fontSize: '12px' }}>View All Details</summary>
                     <div className="details-content">
                         {expandedFields.map(key => (
                             <p key={key}><strong>{key}:</strong> {opportunity[key]}</p>
                         ))}
+                        <p><strong>Compensation & Benefits:</strong>{opportunity['Compensation & Benefits'] || opportunity['Stipend / Compensation']}</p>
+                        <a target="_blank" rel="noreferrer" href={opportunity['Official Link']} className='card-text mui-button'>
+                            <b>Official Link</b>
+                        </a>
                     </div>
                 </details>
             </div>

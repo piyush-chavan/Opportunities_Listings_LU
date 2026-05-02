@@ -7,6 +7,7 @@ import '../App.css';
 import './competitions.css';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import SkeletonGrid from './Skeleton/SkeletonGrid';
 
 const ITEMS_PER_PAGE = 12;
 const EXCEL_FILE_NAME = 'LU Mastersheet.xlsx';
@@ -419,7 +420,6 @@ function CompetitionsListing() {
 
           <div style={{ position: 'sticky', top: 0, borderRadius: '20px', backgroundColor: '#ffffff3c', backdropFilter: 'blur(10px)', padding: '20px 10px' }}>
 
-            {opportunities.length > 0 && (<SearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />)}
             <div style={{ display: 'flex', gap: 8 }}>
               <button className="navbar-btn" style={{ backgroundColor: '#c56224' }} onClick={clearUiFilters}><i className="fa-solid fa-times"></i> Clear Filters</button>
             </div>
@@ -432,7 +432,6 @@ function CompetitionsListing() {
             </span></div>
           )}
           </div>
-          <br />
           <div className="filters-container competitions-filters-container">
             {/* Top Priority Filters */}
             <select value={uiFilters.subjectStream} onChange={(e) => setUiFilters({ ...uiFilters, subjectStream: e.target.value })}>
@@ -519,7 +518,8 @@ function CompetitionsListing() {
 
 
             {error && <div className="error-message">{error}</div>}
-            {loading && <div className="loading-container"><div className="spinner"></div><p>Loading competitions...</p></div>}
+            {/* {loading && <div className="loading-container"><div className="spinner"></div><p>Loading competitions...</p></div>} */}
+            {loading && <SkeletonGrid count={12}/>}
 
             {!loading && filteredOpportunities.length > 0 && (
               <>

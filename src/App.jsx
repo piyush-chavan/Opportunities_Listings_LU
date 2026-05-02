@@ -1,3 +1,4 @@
+import HomePageSkeleton from './components/Skeleton/HomePageSkeleton';
 import {lazy,Suspense} from 'react';
 import './App.css';
 import { HashRouter as Router,Route,Routes } from 'react-router-dom';
@@ -28,7 +29,7 @@ function App() {
   return (
     <Router>
       <div>
-        <Suspense fallback={<div className="loading-container"><div className="spinner"></div><p>Loading...</p></div>}>
+        <Suspense fallback={<HomePageSkeleton/>}>
           <Routes>
             {/* Public Route - Sign In */}
             <Route path="/sign-in" element={<SignInPage />} />

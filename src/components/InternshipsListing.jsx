@@ -7,6 +7,7 @@ import '../App.css';
 import './internships.css';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import SkeletonGrid from './Skeleton/SkeletonGrid';
 
 const ITEMS_PER_PAGE = 12;
 const EXCEL_FILE_NAME = 'LU Mastersheet.xlsx';
@@ -532,8 +533,9 @@ function InternshipsListing() {
 
 
             {error && <div className="error-message">{error}</div>}
-            {loading && <div className="loading-container"><div className="spinner"></div><p>Loading internships...</p></div>}
-
+            {/* {loading && <div className="loading-container"><div className="spinner"></div><p>Loading internships...</p></div>} */}
+                      {loading && <SkeletonGrid count={12}/>}
+          
             {!loading && filteredOpportunities.length > 0 && (
               <>
                 <div className="opportunities-grid">

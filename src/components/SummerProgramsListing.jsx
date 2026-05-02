@@ -7,6 +7,8 @@ import '../App.css';
 import './summerPrograms.css';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import SkeletonGrid from './Skeleton/SkeletonGrid';
+import HomePageSkeleton from './Skeleton/HomePageSkeleton';
 
 const ITEMS_PER_PAGE = 12;
 const EXCEL_FILE_NAME = 'LU Mastersheet.xlsx';
@@ -816,7 +818,8 @@ function SummerProgramsListing() {
 
 
             {error && <div className="error-message">{error}</div>}
-            {loading && <div className="loading-container"><div className="spinner"></div><p>Loading summer programs...</p></div>}
+            {/* {loading && <div className="loading-container"><div className="spinner"></div><p>Loading summer programs...</p></div>} */}
+            {loading && <SkeletonGrid count={12}/>}
 
             {!loading && filteredOpportunities.length > 0 && (
               <>

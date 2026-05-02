@@ -10,7 +10,7 @@
     overflow-y: scroll;
     transform: translateX(0);
     transition: transform 0.3s ease;
-    background-color: #3bff8d5e;
+    background-color: var(--surface);
     backdrop-filter: blur(10px);
 }
 
