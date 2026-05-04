@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import ScholarshipTableCard from './ScholarshipTableCard';
 import Pagination from './Pagination';
 import SearchBar from './SearchBar';
-import { loadExcelSheetFromAssets } from '../utils/excelParser';
+import { processBackendResponse } from '../utils/apiResponseProcessor';
 import '../App.css';
 import './scholarships.css';
 import { useSearchParams } from 'react-router-dom';
@@ -242,7 +242,13 @@ function ScholarshipsListing() {
     setLoading(true);
     setError(null);
     try {
-      const data = await loadExcelSheetFromAssets(EXCEL_FILE_NAME, SHEET_NAME);
+      const response = await fetch('https://googlesheetdata-backend.onrender.com/sheet?spreadsheetId=1uXPkjZVug-va0F67YL035GATEsoLu-8X5QTFxTK_5rA&sheetName=Scholarships Database');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch: ${response.status}`);
+      }
+      const jsonData = await response.json();
+      const data = processBackendResponse(jsonData);
+      
       // Normalize ages, grades and deadlines for consistent filtering/display
       const processed = data.map((opp) => {
         const copy = { ...opp };
@@ -267,7 +273,7 @@ function ScholarshipsListing() {
       }
     } catch (err) {
       console.error(err);
-      setError('Could not load scholarships sheet. Confirm LU Mastersheet.xlsx exists in public/assets and has a sheet named "Scholarships"');
+      setError(`Could not load scholarships data from backend: ${err.message}`);
       setOpportunities([]);
       setFilteredOpportunities([]);
     } finally {

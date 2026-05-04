@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import OpportunityCardCompetition from './OpportunityCardCompetition';
 import Pagination from './Pagination';
 import SearchBar from './SearchBar';
-import { loadExcelSheetFromAssets } from '../utils/excelParser';
+import { processBackendResponse } from '../utils/apiResponseProcessor';
 import '../App.css';
 import './competitions.css';
 import { useSearchParams } from 'react-router-dom';
@@ -305,7 +305,13 @@ function CompetitionsListing() {
     setLoading(true);
     setError(null);
     try {
-      const data = await loadExcelSheetFromAssets(EXCEL_FILE_NAME, SHEET_NAME);
+      const response = await fetch('https://googlesheetdata-backend.onrender.com/sheet?spreadsheetId=1uXPkjZVug-va0F67YL035GATEsoLu-8X5QTFxTK_5rA&sheetName=Competitions Database');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch: ${response.status}`);
+      }
+      const jsonData = await response.json();
+      const data = processBackendResponse(jsonData);
+      
       // Normalize ages, grades and deadlines for consistent filtering/display
       const processed = data.map((opp) => {
         const copy = { ...opp };
@@ -329,7 +335,7 @@ function CompetitionsListing() {
       }
     } catch (err) {
       console.error(err);
-      setError('Could not load competitions sheet. Confirm LU Mastersheet.xlsx exists in public/assets and has a sheet named "Competitions Database"');
+      setError(`Could not load competitions data from backend: ${err.message}`);
       setOpportunities([]);
       setFilteredOpportunities([]);
     } finally {
